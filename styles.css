@@ -36,6 +36,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* На телефоне Safari красит статус-бар в цвет фона страницы: делаем его белым,
+   как навбар. Серая подложка остаётся только по бокам на широком экране. */
+@media (max-width: 430px) {
+  html, body { background: var(--layer); }
+}
+
 button {
   border: 0;
   padding: 0;
