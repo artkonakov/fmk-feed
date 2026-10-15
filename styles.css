@@ -20,7 +20,9 @@
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
   color-scheme: light;
-  font-family: "Google Sans Flex", "Google Sans", Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  /* Google Sans, как в макетах. Не Flex: у Google Sans Flex на Google Fonts
+     нет кириллицы, и русские буквы падали в системный шрифт рядом с цифрами. */
+  font-family: "Google Sans", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
