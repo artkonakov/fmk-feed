@@ -1,0 +1,683 @@
+/* Токены из Figma: 2026 H2 OKR — Growth, Feed 11668:397454 (+ Places-on-map). */
+:root {
+  --bg-main: #f6f6f6;          /* unique/bg/main */
+  --layer: #ffffff;            /* unique/bg/layer1, deep/001 */
+  --deep-999: #000000;
+  --text-secondary: #505359;   /* text/secondary/default */
+  --deep-600: #62666d;
+  --deep-500: #7a7d84;
+  --deep-400: #93969b;
+  --deep-300: #adafb3;
+  --deep-100: #e3e4e5;
+  --deep-050: #ecedee;
+  --primary-500: #0085ff;
+  --primary-100: #d6edff;
+  --saturate-g-500: #06a747;
+  --saturate-o-500: #fa7500;
+  --r-card: 16px;              /* ub/radius */
+  --r-small: 10px;
+  --shadow-chip: 0 6px 12px rgba(24, 36, 47, 0.1);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+  font-family: "Google Sans Flex", "Google Sans", Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; height: 100%; }
+
+body {
+  background: #e9eaec;
+  color: var(--deep-999);
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { display: block; }
+
+#app {
+  position: relative;
+  max-width: 430px;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  background: var(--bg-main);
+  overflow: hidden;
+}
+
+.view { position: relative; height: 100%; display: flex; flex-direction: column; }
+
+.icon-tint {
+  display: block;
+  background-color: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+
+/* ===== Меню ===== */
+.menu-header {
+  padding: calc(var(--safe-t) + 18px) 16px 14px;
+  background: var(--layer);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid var(--deep-100);
+}
+.menu-content { padding: 16px; overflow: auto; }
+.list-card { background: var(--layer); border-radius: var(--r-card); overflow: hidden; }
+.row-divider { height: 1px; margin-left: 16px; background: var(--deep-100); }
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.menu-row:active { background: #f0f1f2; }
+.menu-row.is-disabled { opacity: 0.45; }
+.m-text { flex: 1; min-width: 0; }
+.m-title { font-size: 16px; line-height: 20px; }
+.m-desc { font-size: 13px; line-height: 17px; color: var(--deep-500); margin-top: 2px; }
+
+/* ===== Шапка ребёнка (Figma 11691:404513) ===== */
+.nav {
+  position: relative;
+  z-index: 5;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: calc(var(--safe-t) + 2px) 16px 8px;
+  background: var(--layer);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05); /* [T] Divider */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.nav.is-joined { box-shadow: none; } /* под шапкой висит полоса дня (вариант Б) */
+
+.nav-btn {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--bg-main);
+}
+.nav-btn:active { opacity: 0.6; }
+.nav-btn.is-spinning img { animation: spin 0.7s ease; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.nav-title {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.child-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 700;
+}
+.child-photo {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.child-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 500;
+}
+.status-item { display: flex; align-items: center; gap: 4px; }
+.status-item .icon-tint { width: 14px; height: 14px; }
+.status-item.is-good .icon-tint { color: var(--saturate-g-500); }
+.status-item.is-warn .icon-tint { color: var(--saturate-o-500); }
+.status-sep { width: 1px; height: 10px; background: var(--deep-100); }
+
+/* ===== Лента ===== */
+.feed {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: none; /* без пружины: висящая плашка не отстаёт от ленты */
+  scrollbar-width: none;        /* как в приложении: без браузерной полосы прокрутки */
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px calc(var(--safe-b) + 24px);
+}
+
+.feed::-webkit-scrollbar { display: none; }
+
+.feed-day {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Day stamp (11665:395879): разделитель в потоке ленты, линия всегда видна. */
+.day-stamp {
+  position: relative;
+  z-index: 6; /* поверх висящей плашки; шапку не перекроет — лента обрезает */
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  /* вместе с gap секции между плашкой и карточкой выходит 8px */
+  margin-bottom: -8px;
+}
+.day-stamp::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: 50%;
+  border-top: 1px solid var(--deep-100);
+}
+.day-stamp-pill {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: var(--layer);
+  border: 1px solid var(--deep-100);
+  box-shadow: 0 2px 8px rgba(24, 36, 47, 0.05);
+  font-size: 14px;
+  line-height: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Линия ушла выше висящей пилюли — прячем (см. floatDayStamp). */
+.day-stamp.is-line-hidden::before { visibility: hidden; }
+
+/* Пилюля сейчас висит наверху — в разделителе видна только линия. */
+.day-stamp.is-floating .day-stamp-pill { visibility: hidden; }
+
+/* Висящая копия пилюли у верха ленты: те же отступы, что у разделителя,
+   поэтому в момент смены дня она совпадает с ним пиксель в пиксель. */
+.day-float {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  pointer-events: none;
+}
+/* Прогресс прокрутки дня: серая заливка слева, --progress ставит floatDayStamp. */
+.day-float .day-stamp-pill {
+  background: linear-gradient(
+    to right,
+    var(--deep-050) var(--progress, 0%),
+    var(--layer) var(--progress, 0%)
+  );
+}
+
+/* Своей линии у висящей плашки нет: линия принадлежит разделителю
+   и уезжает вместе с лентой. */
+
+.feed-card {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  flex: none;
+  background: var(--layer);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.feed-card:active { transform: scale(0.98); }
+
+/* --- Feed Card: место --- */
+.place-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+}
+
+.card-head { display: flex; align-items: flex-start; gap: 8px; }
+
+.icon-bg {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-small);
+}
+.icon-bg.is-primary { background: var(--primary-500); }
+.icon-bg.is-deep { background: var(--deep-400); }
+
+.card-title {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+  margin: 0;
+  font-size: 18px;
+  line-height: 19px;
+  font-weight: 700;
+}
+
+.card-time {
+  flex: none;
+  padding-top: 4px;
+  align-self: center;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--text-secondary);
+}
+
+.card-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* _Card label / _Card button */
+.card-label,
+.card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 6px 8px 6px 6px;
+  border-radius: var(--r-small);
+  background: var(--bg-main);
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.card-btn { gap: 0; padding: 6px 6px 6px 10px; color: var(--primary-500); }
+.card-btn:active { opacity: 0.6; }
+.card-btn.is-bell { gap: 4px; padding: 6px 8px 6px 6px; }
+.card-btn.is-bell.is-on { background: #ebf6ff; }
+
+/* Чипы поверх карты: белые с обводкой и тенью. */
+.card-label.is-float,
+.card-btn.is-float {
+  background: var(--layer);
+  border: 1px solid var(--deep-100);
+  box-shadow: var(--shadow-chip);
+}
+.card-label.is-good { color: var(--saturate-g-500); }
+
+/* --- Feed Card: маршрут --- */
+/* Блок с картой и всем, что лежит поверх неё. */
+.route-media {
+  position: relative;
+  height: 250px;
+  background: #eef0ef;
+  overflow: hidden;
+}
+
+/* v2 (Figma 11668:398053): карта 216px, под ней заголовок, время и чипы. */
+.route-card.is-split {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+.route-card.is-split .route-media { height: 216px; }
+.route-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 12px;
+}
+.label-dot { margin: 0 4px 0 6px; }
+
+.route-map {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.route-card.is-map-ready .route-map { opacity: 1; }
+.route-map .maplibregl-canvas { outline: none; }
+
+.route-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.route-play { pointer-events: none; }
+
+.route-top,
+.route-bottom {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.route-top { top: 12px; }
+.route-bottom { bottom: 12px; }
+.route-top > *,
+.route-bottom > * { pointer-events: auto; }
+
+/* [T] Pin Place на карте */
+.map-pin {
+  /* position не задаём: absolute приходит из .maplibregl-marker */
+  width: 28px;
+  height: 28px;
+}
+.map-pin-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%);
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--deep-999);
+  text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff;
+}
+.map-pin-box {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-small);
+}
+.map-pin-box.is-primary { background: var(--primary-500); }
+.map-pin-box.is-deep { background: var(--deep-400); }
+
+/* Тост (как в low-battery) */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-b) + 32px);
+  z-index: 50;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: rgba(20, 28, 36, 0.92);
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== Таймлайн (v3, Figma 11668:401539) ===== */
+/* Слева: от края экрана до линии 12px и от линии до карточки 12px
+   (линия 12–14px, карточка с 26px). Справа поле 16px, как у ленты. */
+.has-timeline .feed { position: relative; padding-left: 8px; padding-right: 16px; }
+.has-timeline .feed-card { margin-left: 18px; } /* 8 + 18 = 26 = 14 (правый край линии) + 12 */
+/* Плашка дня — по центру экрана, как в остальных вариантах; линия на всю ширину. */
+/* Разделитель выходит в правое поле на 8px: так он симметричен (8 + 8),
+   и пилюля стоит ровно по центру экрана. */
+.has-timeline .day-stamp { margin-right: -8px; }
+.has-timeline .day-stamp::before { left: -8px; right: -8px; }
+
+.timeline {
+  position: absolute;
+  top: 0;
+  left: 1px; /* колонка 24px, линия на 11px внутри неё → 12px от края экрана */
+  z-index: 7; /* поверх линий разделителей дня (у .day-stamp z-index 6) */
+  width: 24px;
+  height: 0;
+  pointer-events: none;
+}
+/* Обводка цвета фона отрезает горизонтальную линию дня на пересечении. */
+.timeline-line {
+  position: absolute;
+  left: 11px;
+  width: 2px;
+  background: var(--deep-300);
+  box-shadow: 0 0 0 2px var(--bg-main);
+}
+.timeline-dot {
+  position: absolute;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--layer);
+  border: 2px solid var(--deep-300);
+}
+/* Текущее место: синее кольцо, синяя точка внутри и мягко пульсирующий ореол. */
+.timeline-dot.is-now {
+  border-color: var(--primary-500);
+  background: radial-gradient(circle, var(--primary-500) 3px, var(--layer) 3.5px);
+}
+.timeline-dot.is-now::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  background: var(--primary-500);
+  opacity: 0.2;
+  animation: timeline-pulse 1.8s ease-out infinite;
+}
+@keyframes timeline-pulse {
+  0% { transform: scale(0.6); opacity: 0.35; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timeline-dot.is-now::before { animation: none; }
+}
+
+/* ===== Контрольный вариант (Figma 11699:405063) ===== */
+/* Лента как в приложении сейчас: карточки плотнее, шаг 12px. */
+.is-control .feed-day { gap: 12px; }
+
+.ctl-card { display: flex; flex-direction: column; }
+.ctl-place { gap: 16px; padding: 12px; }
+
+.ctl-head { display: flex; align-items: flex-start; gap: 12px; }
+.ctl-route .ctl-head { align-items: center; padding: 12px 12px 6px; }
+
+/* [T] Icon BG 40px r12: место — синяя, адрес и режим — серая. */
+.ctl-icon {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+}
+.ctl-icon.is-primary { background: var(--primary-500); }
+.ctl-icon.is-plain { background: var(--bg-main); color: var(--deep-999); }
+.ctl-icon > img,
+.ctl-icon > .icon-tint { width: 24px; height: 24px; }
+/* Режим маршрута: прогулка синяя, поездка зелёная — как в макете. */
+.ctl-icon.is-mode > .icon-tint { width: 22px; height: 22px; }
+.ctl-icon.is-walk { color: var(--primary-500); }
+.ctl-icon.is-car { color: var(--saturate-g-500); }
+
+.ctl-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ctl-title {
+  flex: 1;
+  margin: 0;
+  padding: 1px 0 4px;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 700;
+}
+.ctl-route .ctl-title { padding: 0; }
+.ctl-dot { color: var(--deep-500); }
+.ctl-sub { font-size: 14px; line-height: 17px; color: var(--deep-600); }
+
+/* Кнопка-стрелка: 28px серая у маршрута, 24px голубая у сохранённого места. */
+.ctl-arrow {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--bg-main);
+  color: var(--deep-999);
+}
+.ctl-arrow.is-blue { width: 24px; height: 24px; background: var(--primary-100); color: var(--primary-500); }
+.ctl-arrow .icon-tint { width: 16px; height: 16px; }
+
+/* Карта маршрута: 169px, отступ 2px от краёв карточки, r14. */
+.ctl-route .route-media {
+  height: 169px;
+  margin: 0 2px;
+  border-radius: 14px;
+}
+/* «Безопасное вождение»: белая вкладка в углу карты со скруглённым низом справа. */
+.ctl-tag-wrap { left: 0; right: auto; top: 0; }
+.ctl-tag {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 4px 10px;
+  border-bottom-right-radius: 16px;
+  background: var(--layer);
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ctl-tag.is-good { color: var(--saturate-g-500); }
+/* Обратные уголки 12px: справа от вкладки на верхнем крае карты и под ней
+   на левом — белый фон вогнуто перетекает в карту. */
+.ctl-tag::before,
+.ctl-tag::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle at 100% 100%, transparent 11.5px, var(--layer) 12px);
+}
+.ctl-tag::before { top: 0; left: 100%; }
+.ctl-tag::after { top: 100%; left: 0; }
+
+/* Три показателя под картой. */
+.ctl-stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 67px;
+  padding: 0 12px;
+}
+.ctl-stat {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.ctl-stat-value { font-size: 16px; line-height: 19px; font-weight: 700; }
+.ctl-stat-value.is-good { color: var(--saturate-g-500); }
+.ctl-stat-label { font-size: 14px; line-height: 17px; color: var(--deep-600); }
+.ctl-stat-sep { flex: none; width: 1px; height: 23px; background: var(--deep-100); }
+
+/* День в контрольном варианте: в ленте — подпись слева, без линии и пилюли. */
+.is-control .day-stamp { justify-content: flex-start; }
+.is-control .day-stamp::before { content: none; }
+.is-control .day-stamp-pill {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+  will-change: transform;
+}
+
+/* Прилипшая полоса дня (Figma 11708:405721): белая, 30px, пилюля 22px r8. */
+.day-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  height: 30px;
+  padding: 0 16px 8px;
+  background: var(--layer);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+.day-bar.is-shown { opacity: 1; visibility: visible; transition: opacity 0.15s ease; }
+.day-bar-pill {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 22px;
+  border-radius: 8px;
+  background: var(--bg-main);
+  overflow: hidden;
+}
+.day-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-radius: 8px;
+  background: var(--primary-100);
+}
+.day-bar-text {
+  position: relative;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}

@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 2131328185">
+<g clip-path="url(#clip0_0_72)">
+<foreignObject x="-8" y="-8" width="56" height="56"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(4px);clip-path:url(#bgblur_1_0_72_clip_path);height:100%;width:100%"></div></foreignObject><rect id="Rectangle 40546" data-figma-bg-blur-radius="8" width="40" height="40" fill="black" fill-opacity="0.3"/>
+<path id="Polygon 1" d="M25.4937 17.4249C26.8597 18.2136 27.5427 18.6079 27.7719 19.1227C27.9719 19.5717 27.9719 20.0845 27.7719 20.5336C27.5427 21.0484 26.8597 21.4427 25.4937 22.2313L19.0766 25.9363C17.7106 26.725 17.0276 27.1193 16.4671 27.0604C15.9783 27.009 15.5342 26.7526 15.2453 26.3549C14.9141 25.899 14.9141 25.1104 14.9141 23.5331L14.9141 16.1232C14.9141 14.5459 14.9141 13.7572 15.2453 13.3013C15.5342 12.9036 15.9783 12.6473 16.4671 12.5959C17.0276 12.537 17.7106 12.9313 19.0766 13.7199L25.4937 17.4249Z" fill="white"/>
+</g>
+</g>
+<defs>
+<clipPath id="bgblur_1_0_72_clip_path" transform="translate(8 8)"><rect width="40" height="40"/>
+</clipPath><clipPath id="clip0_0_72">
+<rect width="40" height="40" rx="12" fill="white"/>
+</clipPath>
+</defs>
+</svg>
