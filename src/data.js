@@ -13,7 +13,7 @@ const FIG = "assets/figma";
 export const ROUTES = LANG === "en" ? ROUTES_US : ROUTES_RU;
 
 export const CHILD = {
-  name: { ru: "Миша", en: "Misha" }[LANG],
+  name: { ru: "Миша", en: "Alex" }[LANG],
   photo: "assets/Foto Boy.png",
   battery: 83,
   silent: true
