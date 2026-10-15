@@ -139,13 +139,13 @@ function floatDayStamp(feed) {
     }
     float.style.transform = `translateY(${push}px)`;
 
-    // Линия разделителя едет с лентой, но выше середины висящей пилюли её не
-    // видно: она уходит под пилюлю и не показывается ни рядом с её скруглённым
-    // верхом, ни в полоске между пилюлей и шапкой.
-    const pillMiddle = edge + PILL_INSET + pill.offsetHeight / 2;
+    // Линия разделителя едет с лентой и проходит за висящей пилюлей; пропадает
+    // она, только дойдя до верхнего края пилюли, — в полоске между пилюлей
+    // и шапкой её не видно.
+    const pillTop = edge + PILL_INSET;
     stamps.forEach((stamp) => {
       const r = stamp.getBoundingClientRect();
-      stamp.classList.toggle("is-line-hidden", r.top + r.height / 2 < pillMiddle - 0.5);
+      stamp.classList.toggle("is-line-hidden", r.top + r.height / 2 < pillTop);
     });
 
     // Прогресс дня: серая заливка в висящей пилюле. 0 — день только начался
