@@ -5,7 +5,7 @@ import {
 } from "./i18n.js";
 
 // Figma: 2026 H2 OKR — Growth, Feed 11668:397454.
-// Русская версия — Ховрино (как на макете), английская — Кэрроллвуд, Тампа.
+// Русская версия — Ховрино (как на макете), английская — Кресвью, Остин (Техас).
 // Лента одна на оба языка: здесь только числа и ключи, тексты собирает i18n.js.
 
 const FIG = "assets/figma";
@@ -21,7 +21,7 @@ export const CHILD = {
 
 // Места: иконка в шапке карточки (20px на синей/серой плашке) и в пине на карте (18px).
 // Ключи stroiteley / onega остались от русских адресов; в английской версии
-// это адреса рядом с концами маршрутов в Тампе.
+// это адреса рядом с концами маршрутов в Остине.
 const PLACE_DEFS = {
   home: {
     name: { ru: "Дом", en: "Home" },
@@ -37,13 +37,13 @@ const PLACE_DEFS = {
     tone: "primary"
   },
   stroiteley: {
-    name: { ru: "ул. Строителей, 28", en: "1408 Samara Dr" },
+    name: { ru: "ул. Строителей, 28", en: "1408 Romeria Dr" },
     headIcon: `${FIG}/head-pin.svg`,
     pinIcon: `${FIG}/pin-pin.svg`,
     tone: "deep"
   },
   onega: {
-    name: { ru: "Онежская ул., 6", en: "6 Lake Ellen Ln" },
+    name: { ru: "Онежская ул., 6", en: "6 Stobaugh St" },
     headIcon: `${FIG}/head-pin.svg`,
     pinIcon: `${FIG}/pin-pin.svg`,
     tone: "deep"
