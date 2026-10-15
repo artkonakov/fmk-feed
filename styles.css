@@ -197,7 +197,9 @@ img { display: block; }
 /* Day stamp (11665:395879): разделитель в потоке ленты, линия всегда видна. */
 .day-stamp {
   position: relative;
-  z-index: 6; /* поверх висящей плашки; шапку не перекроет — лента обрезает */
+  /* Под висящей плашкой (у неё 4): линия уходит за пилюлю, а не поверх неё.
+     Следующий день плашку не перекрывает — он подпирает её снизу. */
+  z-index: 3;
   display: flex;
   justify-content: center;
   padding: 8px 0;
@@ -480,7 +482,7 @@ img { display: block; }
   position: absolute;
   top: 0;
   left: 1px; /* колонка 24px, линия на 11px внутри неё → 12px от края экрана */
-  z-index: 7; /* поверх линий разделителей дня (у .day-stamp z-index 6) */
+  z-index: 7; /* поверх линий разделителей дня (у .day-stamp z-index 3) */
   width: 24px;
   height: 0;
   pointer-events: none;
