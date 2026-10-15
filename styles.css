@@ -345,6 +345,19 @@ img { display: block; }
   overflow: hidden;
 }
 
+/* Белая обводка 1px по контуру карточки поверх карты (как в макете:
+   border unique/bg/layer1). Под чипами и пинами, над картой. В контрольном
+   варианте не нужна — там карта и так стоит с белым отступом 2px. */
+.route-card:not(.ctl-card)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid var(--layer);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
 /* v2 (Figma 11668:398053): карта 216px, под ней заголовок, время и чипы. */
 .route-card.is-split {
   display: flex;
