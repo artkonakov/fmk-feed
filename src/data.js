@@ -25,7 +25,7 @@ export const CHILD = {
 const PLACE_DEFS = {
   home: {
     name: { ru: "Дом", en: "Home" },
-    now: { ru: "Сейчас Дома", en: "Home now" },
+    now: { ru: "Сейчас Дома", en: "At Home" },
     headIcon: `${FIG}/head-house.svg`,
     pinIcon: `${FIG}/pin-house.svg`,
     tone: "primary"
