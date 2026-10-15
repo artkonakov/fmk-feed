@@ -1,4 +1,5 @@
 import * as maplibregl from "https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.mjs";
+import { LANG } from "./i18n.js";
 
 // Стиль «Findmykids V2 beta light» из Places-on-map: тайлы, спрайты и глифы
 // едут с CDN Findmykids, токен не нужен.
@@ -60,6 +61,7 @@ function createMap(card, canvas, { coords, pins }) {
   map.fitBounds(bounds, { padding: framePadding(card, pinEls), duration: 0 });
 
   map.on("style.load", () => {
+    if (LANG === "en") useLatinLabels(map);
     map.addSource("route", {
       type: "geojson",
       data: { type: "Feature", geometry: { type: "LineString", coordinates: coords } }
@@ -83,6 +85,17 @@ function createMap(card, canvas, { coords, pins }) {
   map.once("idle", () => card.classList.add("is-map-ready"));
 
   return map;
+}
+
+// Подписи стиля берут сначала местное написание (name:nonlatin). Для английской
+// версии — латиница: «coalesce(name:latin, name)».
+function useLatinLabels(map) {
+  map.getStyle().layers.forEach((layer) => {
+    const field = layer.layout?.["text-field"];
+    if (JSON.stringify(field ?? "").includes("name:nonlatin")) {
+      map.setLayoutProperty(layer.id, "text-field", ["coalesce", ["get", "name:latin"], ["get", "name"]]);
+    }
+  });
 }
 
 // Отступы кадра в px от краёв карточки до точек маршрута.

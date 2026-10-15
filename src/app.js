@@ -1,4 +1,5 @@
 import { CHILD, PLACES, DAYS, ROUTES, ICON, VARIANTS, VARIANT_ALIASES } from "./data.js";
+import { LANG, T, fmtDistance, fmtInt, plural, withLang } from "./i18n.js";
 import { mountRouteMap } from "./feedmap.js";
 
 // Day stamp: отступ пилюли от верха разделителя и висящей плашки (padding-top
@@ -15,15 +16,16 @@ let placeStyle = "default";
 
 // --- Меню ------------------------------------------------------------------
 function renderMenu() {
-  document.title = "Лента";
+  document.title = T.menuTitle;
   document.getElementById("menuView").hidden = false;
+  document.querySelector(".menu-header").textContent = T.menuTitle;
   const list = document.getElementById("menuList");
 
   Object.entries(VARIANTS).forEach(([id, v], idx) => {
     if (idx > 0) list.append(el("div", "row-divider"));
     const row = el(v.disabled ? "div" : "a", "menu-row");
     if (v.disabled) row.classList.add("is-disabled");
-    else row.href = `?p=${id}`;
+    else row.href = withLang(`p=${id}`);
     row.innerHTML = `
       <div class="m-text">
         <div class="m-title">${v.title}</div>
@@ -36,6 +38,8 @@ function renderMenu() {
 // --- Прототип --------------------------------------------------------------
 function renderProto(id) {
   document.title = VARIANTS[id].title;
+  document.getElementById("backBtn").setAttribute("aria-label", T.back);
+  document.getElementById("refreshBtn").setAttribute("aria-label", T.refresh);
   routeStyle = VARIANTS[id].routeCard ?? "overlay";
   placeStyle = VARIANTS[id].placeCard ?? "default";
   document.body.classList.toggle("is-control", placeStyle === "control");
@@ -59,7 +63,7 @@ function renderProto(id) {
   if (VARIANTS[id].timeline) drawTimeline(feed);
 
   document.getElementById("backBtn").addEventListener("click", () => {
-    location.href = location.pathname;
+    location.href = withLang();
   });
   document.getElementById("refreshBtn").addEventListener("click", (e) => {
     const btn = e.currentTarget;
@@ -84,7 +88,7 @@ function renderHeader() {
       ${CHILD.silent ? `
         <span class="status-sep"></span>
         <span class="status-item is-warn">
-          <span class="icon-tint" style="--icon:url('assets/icon-24-sound-off.svg')"></span><span class="status-text">Без звука</span>
+          <span class="icon-tint" style="--icon:url('assets/icon-24-sound-off.svg')"></span><span class="status-text">${T.silent}</span>
         </span>` : ""}
     </span>`;
 }
@@ -195,16 +199,16 @@ function placeCard(item) {
   card.querySelector(".card-btn.is-bell")?.addEventListener("click", (e) => {
     e.stopPropagation();
     const on = e.currentTarget.classList.toggle("is-on");
-    toast(on ? `Уведомления о месте «${place.name}» включены` : "Уведомления выключены");
+    toast(on ? T.alertsOn(place.name) : T.alertsOff);
   });
-  card.addEventListener("click", () => toast("Откроются детали места"));
+  card.addEventListener("click", () => toast(T.toastPlace));
   return card;
 }
 
 // Feed Card (маршрут). Два стиля (VARIANTS[*].routeCard):
 //   overlay — статичная карта на всю карточку, чипы лежат поверх (v1);
 //   split   — карта сверху, под ней «Прогулка • 2,5 км», время и чипы (v2).
-const MODE_TITLE = { walk: "Прогулка", car: "Поездка" };
+const MODE_TITLE = { walk: T.walk, car: T.drive };
 
 function routeCard(item) {
   if (routeStyle === "control") return routeCardControl(item);
@@ -236,7 +240,7 @@ function routeCard(item) {
       ${media(item.badges?.left ? `<div class="route-top">${badge(item.badges.left)}</div>` : "")}
       <div class="route-content">
         <div class="card-head">
-          <h2 class="card-title">${MODE_TITLE[item.mode]} • ${formatKm(routeLength(coords))}</h2>
+          <h2 class="card-title">${MODE_TITLE[item.mode]} • ${fmtDistance(routeLength(coords))}</h2>
           <span class="card-time">${item.time}</span>
         </div>
         <div class="card-row">
@@ -257,7 +261,7 @@ function routeCard(item) {
       </div>`);
   }
 
-  card.addEventListener("click", () => toast("Откроются детали маршрута"));
+  card.addEventListener("click", () => toast(T.toastRoute));
 
   // Пины ставятся на концы линии, чтобы она упиралась ровно в плашку.
   // В split-карточке подписи — «СТАРТ» / «ФИНИШ» вместо «Вышел в 15:02».
@@ -269,7 +273,7 @@ function routeCard(item) {
   });
   mountRouteMap(card, {
     coords,
-    pins: [pin(item.from, coords[0], "СТАРТ"), pin(item.to, coords.at(-1), "ФИНИШ")]
+    pins: [pin(item.from, coords[0], T.start), pin(item.to, coords.at(-1), T.finish)]
   });
   return card;
 }
@@ -283,7 +287,7 @@ function placeCardControl(item) {
   const place = PLACES[item.place];
   const isAddress = place.tone === "deep";
   const card = el("article", "feed-card ctl-card ctl-place");
-  const time = item.time.startsWith("с ") ? item.time : `${item.time} (${item.duration})`;
+  const time = item.ongoing ? item.time : `${item.time} (${item.duration})`;
   card.innerHTML = `
     <div class="ctl-head">
       <span class="ctl-icon ${isAddress ? "is-plain" : "is-primary"}">
@@ -297,7 +301,7 @@ function placeCardControl(item) {
       </div>
       ${isAddress ? "" : `<span class="ctl-arrow is-blue"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>`}
     </div>`;
-  card.addEventListener("click", () => toast("Откроются детали места"));
+  card.addEventListener("click", () => toast(T.toastPlace));
   return card;
 }
 
@@ -305,12 +309,16 @@ function placeCardControl(item) {
 function routeCardControl(item) {
   const coords = ROUTES[item.route];
   const meters = routeLength(coords);
-  const [eventsCount, ...eventsWord] = item.events.split(" ");
   const speed = item.badges?.right?.label;
+  const steps = Math.round(meters / 0.72);
   const first = item.mode === "car" && speed
-    ? { value: speed.trim(), label: "макс. скорость", good: item.badges?.left?.tone === "good" }
-    : { value: formatInt(Math.round(meters / 0.72)), label: "шагов" };
-  const stats = [first, { value: formatKm(meters), label: "расстояние" }, { value: eventsCount, label: eventsWord.join(" ") }];
+    ? { value: speed, label: T.maxSpeed, good: item.badges?.left?.tone === "good" }
+    : { value: fmtInt(steps), label: plural(steps, T.stepsWord) };
+  const stats = [
+    first,
+    { value: fmtDistance(meters), label: T.distance },
+    { value: item.eventsCount, label: plural(item.eventsCount, T.eventsWord) }
+  ];
   const safe = item.badges?.left;
 
   const card = el("article", "feed-card route-card ctl-card ctl-route");
@@ -343,7 +351,7 @@ function routeCardControl(item) {
         </div>`).join('<span class="ctl-stat-sep"></span>')}
     </div>`;
 
-  card.addEventListener("click", () => toast("Откроются детали маршрута"));
+  card.addEventListener("click", () => toast(T.toastRoute));
   const pin = ({ place }, lngLat, label) => ({
     icon: PLACES[place].pinIcon,
     tone: PLACES[place].tone,
@@ -352,13 +360,9 @@ function routeCardControl(item) {
   });
   mountRouteMap(card, {
     coords,
-    pins: [pin(item.from, coords[0], "СТАРТ"), pin(item.to, coords.at(-1), "ФИНИШ")]
+    pins: [pin(item.from, coords[0], T.start), pin(item.to, coords.at(-1), T.finish)]
   });
   return card;
-}
-
-function formatInt(n) {
-  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
 }
 
 // Длина линии маршрута в метрах (по сфере — для коротких отрезков хватает).
@@ -374,10 +378,6 @@ function routeLength(coords) {
     total += Math.hypot(x, y) * R;
   }
   return total;
-}
-
-function formatKm(meters) {
-  return `${(meters / 1000).toFixed(1).replace(".", ",")} км`;
 }
 
 // День в контрольном варианте (Figma 11708:405731 и 11708:405721).
@@ -487,6 +487,7 @@ function el(tag, className) {
 
 // Роутинг как в low-battery: без ?p — меню вариантов, ?p=v1 — прототип.
 // Стоит в конце модуля: к этому моменту объявлены все const/let выше.
+document.documentElement.lang = LANG;
 const params = new URLSearchParams(location.search);
 const requested = params.get("p");
 const variantId = VARIANT_ALIASES[requested] ?? requested;

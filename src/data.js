@@ -1,44 +1,58 @@
-import { ROUTES } from "./routes.js";
+import { ROUTES as ROUTES_RU } from "./routes.js";
+import { ROUTES_US } from "./routes-us.js";
+import {
+  LANG, T, fmtDuration, fmtTime, fmtRange, fmtSpeed, fmtEvents, fmtDay
+} from "./i18n.js";
 
 // Figma: 2026 H2 OKR — Growth, Feed 11668:397454.
-// Карта — Ховрино (как на макете). Координаты [lng, lat].
+// Русская версия — Ховрино (как на макете), английская — Кэрроллвуд, Тампа.
+// Лента одна на оба языка: здесь только числа и ключи, тексты собирает i18n.js.
 
 const FIG = "assets/figma";
 
+export const ROUTES = LANG === "en" ? ROUTES_US : ROUTES_RU;
+
 export const CHILD = {
-  name: "Миша",
+  name: { ru: "Миша", en: "Misha" }[LANG],
   photo: "assets/Foto Boy.png",
   battery: 83,
   silent: true
 };
 
 // Места: иконка в шапке карточки (20px на синей/серой плашке) и в пине на карте (18px).
-export const PLACES = {
+// Ключи stroiteley / onega остались от русских адресов; в английской версии
+// это адреса рядом с концами маршрутов в Тампе.
+const PLACE_DEFS = {
   home: {
-    name: "Дом",
+    name: { ru: "Дом", en: "Home" },
+    now: { ru: "Сейчас Дома", en: "Home now" },
     headIcon: `${FIG}/head-house.svg`,
     pinIcon: `${FIG}/pin-house.svg`,
     tone: "primary"
   },
   school: {
-    name: "Школа",
+    name: { ru: "Школа", en: "School" },
     headIcon: `${FIG}/head-school-cap.svg`,
     pinIcon: `${FIG}/pin-school-cap.svg`,
     tone: "primary"
   },
   stroiteley: {
-    name: "ул. Строителей, 28",
+    name: { ru: "ул. Строителей, 28", en: "1408 Samara Dr" },
     headIcon: `${FIG}/head-pin.svg`,
     pinIcon: `${FIG}/pin-pin.svg`,
     tone: "deep"
   },
   onega: {
-    name: "Онежская ул., 6",
+    name: { ru: "Онежская ул., 6", en: "6 Lake Ellen Ln" },
     headIcon: `${FIG}/head-pin.svg`,
     pinIcon: `${FIG}/pin-pin.svg`,
     tone: "deep"
   }
 };
+
+export const PLACES = Object.fromEntries(
+  Object.entries(PLACE_DEFS).map(([id, p]) => [id, { ...p, name: p.name[LANG], now: p.now?.[LANG] }])
+);
 
 const ICON = {
   history: `${FIG}/icon-history.svg`,
@@ -51,156 +65,84 @@ const ICON = {
 };
 export { ICON };
 
-// Лента сверху вниз: от «сейчас» к прошлому, по дням. Day stamp (11665:395879)
-// у каждого дня прилипает к верху, пока день на экране. Два типа блоков:
-//   place — пребывание в месте, route — перемещение между местами (карта).
+// Лента сверху вниз: от «сейчас» к прошлому, по дням.
+//   place — пребывание в месте: since (сейчас там) или from/to, minutes, action;
+//   route — перемещение: from/to { place, at }, mode, minutes, events,
+//           safe (безопасное вождение), speed — макс. скорость, км/ч.
 const TODAY = [
-  {
-    type: "place",
-    place: "home",
-    title: "Сейчас Дома",
-    time: "с 16:00",
-    duration: "1 ч 30 мин",
-    action: { kind: "more", label: "Подробнее" }
-  },
-  {
-    type: "route",
-    route: "toHome",
-    from: { place: "stroiteley", label: "Вышел в 15:02" },
-    to: { place: "home", label: "Пришёл в 16:00" },
-    time: "15:02 — 16:00",
-    mode: "walk",
-    duration: "58 мин",
-    events: "11 событий"
-  },
-  {
-    type: "place",
-    place: "stroiteley",
-    time: "14:32 — 15:02",
-    duration: "30 мин",
-    action: { kind: "more", label: "Подробнее" }
-  },
-  {
-    type: "route",
-    route: "toStroiteley",
-    from: { place: "school", label: "Вышел в 13:30" },
-    to: { place: "stroiteley", label: "Пришёл в 14:32" },
-    time: "13:30 — 14:32",
-    mode: "walk",
-    duration: "1 ч 02 мин",
-    events: "3 события"
-  },
-  {
-    type: "place",
-    place: "school",
-    time: "10:00 — 13:30",
-    duration: "1 ч 30 мин",
-    action: { kind: "bell", label: "Вкл. уведомления" }
-  },
-  {
-    type: "route",
-    route: "toSchool",
-    from: { place: "home", label: "Выехал в 09:30" },
-    to: { place: "school", label: "Приехал в 10:00" },
-    time: "09:30 — 10:00",
-    mode: "car",
-    duration: "30 мин",
-    events: "2 события",
-    badges: {
-      left: { icon: "star", label: "Безопасное вождение", tone: "good" },
-      right: { icon: "speed", label: "64 км/ч" }
-    }
-  },
-  {
-    type: "place",
-    place: "home",
-    time: "21:20 — 09:30",
-    duration: "12 ч 10 мин",
-    action: { kind: "more", label: "Подробнее" }
-  }
+  { type: "place", place: "home", now: true, since: "16:00", minutes: 90, action: "more" },
+  { type: "route", route: "toHome", from: { place: "stroiteley", at: "15:02" }, to: { place: "home", at: "16:00" }, mode: "walk", minutes: 58, events: 11 },
+  { type: "place", place: "stroiteley", from: "14:32", to: "15:02", minutes: 30, action: "more" },
+  { type: "route", route: "toStroiteley", from: { place: "school", at: "13:30" }, to: { place: "stroiteley", at: "14:32" }, mode: "walk", minutes: 62, events: 3 },
+  { type: "place", place: "school", from: "10:00", to: "13:30", minutes: 90, action: "bell" },
+  { type: "route", route: "toSchool", from: { place: "home", at: "09:30" }, to: { place: "school", at: "10:00" }, mode: "car", minutes: 30, events: 2, safe: true, speed: 64 },
+  { type: "place", place: "home", from: "21:20", to: "09:30", minutes: 730, action: "more" }
 ];
 
-// Вчера: те же места и маршруты, другое время — для проверки липкой плашки.
 const YESTERDAY = [
-  {
-    type: "route",
-    route: "onegaToHome",
-    from: { place: "onega", label: "Вышел в 21:02" },
-    to: { place: "home", label: "Пришёл в 21:20" },
-    time: "21:02 — 21:20",
-    mode: "walk",
-    duration: "18 мин",
-    events: "8 событий"
-  },
-  {
-    type: "place",
-    place: "onega",
-    time: "18:05 — 21:02",
-    duration: "2 ч 57 мин",
-    action: { kind: "more", label: "Подробнее" }
-  },
-  {
-    type: "route",
-    route: "schoolToOnega",
-    from: { place: "school", label: "Вышел в 17:30" },
-    to: { place: "onega", label: "Пришёл в 18:05" },
-    time: "17:30 — 18:05",
-    mode: "walk",
-    duration: "35 мин",
-    events: "4 события"
-  },
-  {
-    type: "place",
-    place: "school",
-    time: "08:30 — 17:30",
-    duration: "9 ч 00 мин",
-    action: { kind: "more", label: "Подробнее" }
-  },
-  {
-    type: "route",
-    route: "toSchool",
-    from: { place: "home", label: "Выехал в 08:05" },
-    to: { place: "school", label: "Приехал в 08:30" },
-    time: "08:05 — 08:30",
-    mode: "car",
-    duration: "25 мин",
-    events: "2 события",
-    badges: {
-      left: { icon: "star", label: "Безопасное вождение", tone: "good" },
-      right: { icon: "speed", label: "58 км/ч" }
-    }
-  },
-  {
-    type: "place",
-    place: "home",
-    time: "21:40 — 08:05",
-    duration: "10 ч 25 мин",
-    action: { kind: "more", label: "Подробнее" }
-  }
+  { type: "route", route: "onegaToHome", from: { place: "onega", at: "21:02" }, to: { place: "home", at: "21:20" }, mode: "walk", minutes: 18, events: 8 },
+  { type: "place", place: "onega", from: "18:05", to: "21:02", minutes: 177, action: "more" },
+  { type: "route", route: "schoolToOnega", from: { place: "school", at: "17:30" }, to: { place: "onega", at: "18:05" }, mode: "walk", minutes: 35, events: 4 },
+  { type: "place", place: "school", from: "08:30", to: "17:30", minutes: 540, action: "more" },
+  { type: "route", route: "toSchool", from: { place: "home", at: "08:05" }, to: { place: "school", at: "08:30" }, mode: "car", minutes: 25, events: 2, safe: true, speed: 58 },
+  { type: "place", place: "home", from: "21:40", to: "08:05", minutes: 625, action: "more" }
 ];
+
+// Из чисел — готовые строки под текущий язык. Поля те же, что читают карточки.
+function localize(item) {
+  if (item.type === "place") {
+    return {
+      ...item,
+      title: item.now ? PLACES[item.place].now : undefined,
+      time: item.since ? T.since(fmtTime(item.since)) : fmtRange(item.from, item.to),
+      ongoing: Boolean(item.since),
+      duration: fmtDuration(item.minutes),
+      action: item.action === "bell"
+        ? { kind: "bell", label: T.turnOnAlerts }
+        : { kind: "more", label: T.more }
+    };
+  }
+  return {
+    ...item,
+    from: { place: item.from.place, label: T.left[item.mode](fmtTime(item.from.at)) },
+    to: { place: item.to.place, label: T.arrived[item.mode](fmtTime(item.to.at)) },
+    time: fmtRange(item.from.at, item.to.at),
+    duration: fmtDuration(item.minutes),
+    eventsCount: item.events,
+    events: fmtEvents(item.events),
+    badges: item.safe || item.speed
+      ? {
+          left: item.safe ? { icon: "star", label: T.safeDriving, tone: "good" } : undefined,
+          right: item.speed ? { icon: "speed", label: fmtSpeed(item.speed) } : undefined
+        }
+      : undefined
+  };
+}
 
 export const DAYS = [
-  { label: "Сегодня", items: TODAY },
-  { label: "Вчера, 17 сентября", items: YESTERDAY }
+  { label: fmtDay({ day: "today" }), items: TODAY.map(localize) },
+  { label: fmtDay({ day: "yesterday", month: 9, date: 17 }), items: YESTERDAY.map(localize) }
 ];
 
-export { ROUTES };
-
-// Меню вариантов, как в low-battery: ?p=a / b / c / d. Буквы перемешаны
-// относительно дизайна и подписей в меню нет, чтобы по экрану выбора нельзя было
-// угадать, какой вариант какой. Что за буквой:
+// Меню вариантов, как в low-battery: ?p=a / b / c / d (+ &lang=en). Буквы
+// перемешаны относительно дизайна и подписей в меню нет, чтобы по экрану
+// выбора нельзя было угадать, какой вариант какой. Что за буквой:
 //   а — карточка маршрута «карта сверху, текст и чипы под ней» (Figma 11668:398053);
 //   б — контрольный: как в приложении сейчас (Figma 11699:405063);
 //   в — таймлайн слева от карточек (Figma 11668:401539);
 //   г — базовая лента, чипы лежат на карте (Figma 11668:397454).
 // routeCard: "overlay" — чипы на карте; "split" — текст и чипы под картой;
 // "control" (+ placeCard: "control") — контрольный вариант.
-export const VARIANTS = {
-  a: { title: "Вариант А", routeCard: "split" },
-  b: { title: "Вариант Б", routeCard: "control", placeCard: "control" },
-  c: { title: "Вариант В", routeCard: "overlay", timeline: true },
-  d: { title: "Вариант Г", routeCard: "overlay" }
+const VARIANT_DEFS = {
+  a: { routeCard: "split" },
+  b: { routeCard: "control", placeCard: "control" },
+  c: { routeCard: "overlay", timeline: true },
+  d: { routeCard: "overlay" }
 };
+
+export const VARIANTS = Object.fromEntries(
+  Object.entries(VARIANT_DEFS).map(([id, v]) => [id, { ...v, title: `${T.option} ${T.letters[id]}` }])
+);
 
 // Старые ссылки ?p=v1 / v2 / v3 открывают тот же вариант под новой буквой.
 export const VARIANT_ALIASES = { v1: "d", v2: "a", v3: "c", control: "b" };
