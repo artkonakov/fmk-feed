@@ -47,7 +47,7 @@ export const STRINGS = {
     turnOnAlerts: "Turn on alerts",
     safeDriving: "Safe driving",
     walk: "Walk",
-    drive: "Drive",
+    drive: "Ride",
     start: "START",
     finish: "FINISH",
     distance: "distance",
