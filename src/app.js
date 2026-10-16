@@ -12,6 +12,7 @@ const DAY_GAP = 16; // gap между секциями дней в .feed
 // место: "default" | "control" (контрольный — как сейчас в приложении).
 let routeStyle = "overlay";
 let placeStyle = "default";
+let durationIcon = "history";
 
 
 // --- Меню ------------------------------------------------------------------
@@ -42,6 +43,7 @@ function renderProto(id) {
   document.getElementById("refreshBtn").setAttribute("aria-label", T.refresh);
   routeStyle = VARIANTS[id].routeCard ?? "overlay";
   placeStyle = VARIANTS[id].placeCard ?? "default";
+  durationIcon = VARIANTS[id].durationIcon ?? "history";
   document.body.classList.toggle("is-control", placeStyle === "control");
   document.body.dataset.variant = id;
   document.body.classList.toggle("has-timeline", Boolean(VARIANTS[id].timeline));
@@ -186,7 +188,7 @@ function placeCard(item) {
     </div>
     <div class="card-row">
       <span class="card-label">
-        <img src="${ICON.history}" width="20" height="20" alt="">${item.duration}
+        <img src="${ICON[durationIcon]}" width="20" height="20" alt="">${item.duration}
       </span>
       ${action}
     </div>`;

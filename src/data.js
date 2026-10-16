@@ -56,6 +56,7 @@ export const PLACES = Object.fromEntries(
 
 const ICON = {
   history: `${FIG}/icon-history.svg`,
+  time: `${FIG}/icon-time.svg`,
   walk: `${FIG}/icon-walking.svg`,
   car: `${FIG}/icon-car.svg`,
   speed: `${FIG}/icon-speed.svg`,
@@ -133,11 +134,13 @@ export const DAYS = [
 //   г — базовая лента, чипы лежат на карте (Figma 11668:397454).
 // routeCard: "overlay" — чипы на карте; "split" — текст и чипы под картой;
 // "control" (+ placeCard: "control") — контрольный вариант.
+// durationIcon: иконка у длительности в карточке места ("history" по умолчанию,
+// "time" — часы, Figma 11668:397475).
 const VARIANT_DEFS = {
   a: { routeCard: "split" },
   b: { routeCard: "control", placeCard: "control" },
   c: { routeCard: "overlay", timeline: true },
-  d: { routeCard: "overlay" }
+  d: { routeCard: "overlay", durationIcon: "time" }
 };
 
 export const VARIANTS = Object.fromEntries(
