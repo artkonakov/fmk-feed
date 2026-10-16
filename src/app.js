@@ -13,6 +13,8 @@ const DAY_GAP = 16; // gap между секциями дней в .feed
 let routeStyle = "overlay";
 let placeStyle = "default";
 let durationIcon = "history";
+let dayBar = "bar"; // "bar" — полоса дня контрольного, "pill" — капсула, как в остальных вариантах
+let routeTitle = "mode"; // "mode" — «Прогулка • 58 мин», "duration" — только «58 мин»
 
 
 // --- Меню ------------------------------------------------------------------
@@ -44,7 +46,11 @@ function renderProto(id) {
   routeStyle = VARIANTS[id].routeCard ?? "overlay";
   placeStyle = VARIANTS[id].placeCard ?? "default";
   durationIcon = VARIANTS[id].durationIcon ?? "history";
-  document.body.classList.toggle("is-control", placeStyle === "control");
+  routeTitle = VARIANTS[id].routeTitle ?? "mode";
+  document.body.classList.toggle("is-inline-time", routeTitle === "duration");
+  dayBar = VARIANTS[id].dayBar ?? (placeStyle === "control" ? "bar" : "pill");
+  document.body.classList.toggle("is-control", dayBar === "bar");
+  document.body.classList.toggle("is-compact", placeStyle === "control");
   document.body.dataset.variant = id;
   document.body.classList.toggle("has-timeline", Boolean(VARIANTS[id].timeline));
   document.getElementById("protoView").hidden = false;
@@ -108,7 +114,7 @@ function dayStamp({ label }) {
 // (с линией); следующий, подъехав, толкает висящую вверх, а дойдя до верха,
 // совпадает с её местом — и висящая плашка берёт его дату.
 function floatDayStamp(feed) {
-  if (placeStyle === "control") return floatDayBarControl(feed);
+  if (dayBar === "bar") return floatDayBarControl(feed);
   const view = document.getElementById("protoView");
   const float = el("div", "day-float");
   float.innerHTML = `<span class="day-stamp-pill"></span>`;
@@ -282,7 +288,7 @@ function routeCard(item) {
 function placeCardControl(item) {
   const place = PLACES[item.place];
   const isAddress = place.tone === "deep";
-  const card = el("article", "feed-card ctl-card ctl-place");
+  const card = el("article", `feed-card ctl-card ctl-place${routeTitle === "duration" ? " is-inline" : ""}`);
   const time = item.ongoing ? item.time : `${item.time} (${item.duration})`;
   card.innerHTML = `
     <div class="ctl-head">
@@ -291,11 +297,17 @@ function placeCardControl(item) {
           ? `<span class="icon-tint" style="--icon:url('${place.headIcon}')"></span>`
           : `<img src="${place.headIcon}" alt="">`}
       </span>
+      ${routeTitle === "duration" ? `
+      <div class="ctl-text">
+        <h2 class="ctl-title">${item.duration}</h2>
+        <span class="ctl-sub is-name">${item.title ?? place.name}</span>
+      </div>
+      <span class="ctl-sub">${item.time}</span>` : `
       <div class="ctl-text">
         <h2 class="ctl-title">${item.title ?? place.name}</h2>
         <span class="ctl-sub">${time}</span>
-      </div>
-      ${isAddress ? "" : `<span class="ctl-arrow is-blue"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>`}
+      </div>`}
+      ${isAddress && routeTitle !== "duration" ? "" : `<span class="ctl-arrow${routeTitle === "duration" ? "" : " is-blue"}"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>`}
     </div>`;
   card.addEventListener("click", () => toast(T.toastPlace));
   return card;
@@ -321,10 +333,13 @@ function routeCardControl(item) {
   card.innerHTML = `
     <div class="ctl-head">
       <span class="ctl-icon is-plain is-mode is-${item.mode}"><span class="icon-tint" style="--icon:url('${ICON[item.mode]}')"></span></span>
+      ${routeTitle === "duration" ? `
+      <h2 class="ctl-title">${item.duration}</h2>
+      <span class="ctl-sub">${item.time}</span>` : `
       <div class="ctl-text">
         <h2 class="ctl-title">${MODE_TITLE[item.mode]} <span class="ctl-dot">•</span> ${item.duration}</h2>
         <span class="ctl-sub">${item.time}</span>
-      </div>
+      </div>`}
       <span class="ctl-arrow"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>
     </div>
     <div class="route-media">

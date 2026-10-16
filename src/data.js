@@ -131,7 +131,8 @@ export const DAYS = [
 //   а — карточка маршрута «карта сверху, текст и чипы под ней» (Figma 11668:398053);
 //   б — контрольный: как в приложении сейчас (Figma 11699:405063);
 //   в — таймлайн слева от карточек (Figma 11668:401539);
-//   г — базовая лента, чипы лежат на карте (Figma 11668:397454).
+//   г — базовая лента, чипы лежат на карте (Figma 11668:397454);
+//   е — карточки как в контрольном, но заголовок маршрута — только длительность.
 // routeCard: "overlay" — чипы на карте; "split" — текст и чипы под картой;
 // "control" (+ placeCard: "control") — контрольный вариант.
 // durationIcon: иконка у длительности в карточке места ("history" по умолчанию,
@@ -140,7 +141,8 @@ const VARIANT_DEFS = {
   a: { routeCard: "split" },
   b: { routeCard: "control", placeCard: "control" },
   c: { routeCard: "overlay", timeline: true },
-  d: { routeCard: "overlay", durationIcon: "time" }
+  d: { routeCard: "overlay", durationIcon: "time" },
+  f: { routeCard: "control", placeCard: "control", routeTitle: "duration", dayBar: "pill" }
 };
 
 export const VARIANTS = Object.fromEntries(
