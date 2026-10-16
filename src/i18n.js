@@ -7,7 +7,7 @@ export const STRINGS = {
   ru: {
     menuTitle: "Лента",
     option: "Вариант",
-    letters: { a: "А", b: "Б", c: "В", d: "Г", f: "Е" },
+    letters: { a: "А", b: "Б", c: "В", d: "Г", f: "Д" },
     back: "Назад",
     refresh: "Обновить",
     silent: "Без звука",
