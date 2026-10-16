@@ -227,9 +227,6 @@ img { display: block; }
   white-space: nowrap;
 }
 
-/* Линия ушла выше висящей пилюли — прячем (см. floatDayStamp). */
-.day-stamp.is-line-hidden::before { visibility: hidden; }
-
 /* Пилюля сейчас висит наверху — в разделителе видна только линия. */
 .day-stamp.is-floating .day-stamp-pill { visibility: hidden; }
 
