@@ -386,7 +386,7 @@ img { display: block; }
   position: absolute;
   inset: 0;
   z-index: 2;
-  border: 1px solid var(--layer);
+  border: 1px solid var(--deep-001); /* белая в светлой теме, чёрная в тёмной */
   border-radius: inherit;
   pointer-events: none;
 }
