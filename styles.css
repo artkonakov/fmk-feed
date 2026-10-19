@@ -1,7 +1,8 @@
 /* Токены из Figma: 2026 H2 OKR — Growth, Feed 11668:397454 (+ Places-on-map). */
 :root {
   --bg-main: #f6f6f6;          /* unique/bg/main */
-  --layer: #ffffff;            /* unique/bg/layer1, deep/001 */
+  --layer: #ffffff;            /* unique/bg/layer1 */
+  --deep-001: #ffffff;         /* deep/001: чипы поверх карты */
   --deep-999: #000000;
   --text-secondary: #505359;   /* text/secondary/default */
   --deep-600: #62666d;
@@ -17,12 +18,43 @@
   --r-card: 16px;              /* ub/radius */
   --r-small: 10px;
   --shadow-chip: 0 6px 12px rgba(24, 36, 47, 0.1);
+  --divider: rgba(0, 0, 0, 0.05);   /* unique/black-white/transparent-95 */
+  --page: #e9eaec;                  /* подложка вокруг прототипа на широком экране */
+  --map-placeholder: #eef0ef;       /* фон карты, пока грузятся тайлы */
+  --map-halo: #ffffff;              /* ореол подписей пинов на карте */
+  --toast-bg: rgba(20, 28, 36, 0.92);
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
-  color-scheme: light;
+  color-scheme: light dark;
   /* Google Sans, как в макетах. Не Flex: у Google Sans Flex на Google Fonts
      нет кириллицы, и русские буквы падали в системный шрифт рядом с цифрами. */
   font-family: "Google Sans", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+}
+
+/* Тёмная тема — по системной настройке, значения режима «FMK – Dark»
+   коллекции Color TENET (Figma: тёмный экран 12038:285889). Имена те же,
+   меняются только значения; синий, зелёный, оранжевый и deep/400 общие. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-main: #000000;
+    --layer: #1a1a1a;
+    --deep-001: #000000;
+    --deep-999: #ffffff;
+    --text-secondary: #e3e4e5;   /* deep/700 */
+    --deep-600: #c8c9cc;
+    --deep-500: #adafb3;
+    --deep-300: #7a7d84;
+    --deep-100: #505359;
+    --deep-050: #3f4145;
+    --primary-100: #002147;
+    --divider: rgba(255, 255, 255, 0.05);
+    --page: #0d0d0d;
+    --map-placeholder: #151517;  /* фон тёмного стиля карты */
+    --map-halo: #000000;
+    --toast-bg: rgba(63, 65, 69, 0.95);
+  }
+  /* Чёрные иконки-картинки навбара — белыми. */
+  .nav-btn img { filter: invert(1); }
 }
 
 * { box-sizing: border-box; }
@@ -31,7 +63,7 @@
 html, body { margin: 0; height: 100%; }
 
 body {
-  background: #e9eaec;
+  background: var(--page);
   color: var(--deep-999);
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
@@ -96,7 +128,7 @@ img { display: block; }
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.menu-row:active { background: #f0f1f2; }
+.menu-row:active { background: var(--deep-050); }
 .menu-row.is-disabled { opacity: 0.45; }
 .m-text { flex: 1; min-width: 0; }
 .m-title { font-size: 16px; line-height: 20px; }
@@ -112,7 +144,7 @@ img { display: block; }
   gap: 4px;
   padding: calc(var(--safe-t) + 2px) 16px 8px;
   background: var(--layer);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05); /* [T] Divider */
+  box-shadow: 0 1px 0 var(--divider); /* [T] Divider */
   user-select: none;
   -webkit-user-select: none;
 }
@@ -326,12 +358,12 @@ img { display: block; }
 .card-btn { gap: 0; padding: 6px 6px 6px 10px; color: var(--primary-500); }
 .card-btn:active { opacity: 0.6; }
 .card-btn.is-bell { gap: 4px; padding: 6px 8px 6px 6px; }
-.card-btn.is-bell.is-on { background: #ebf6ff; }
+.card-btn.is-bell.is-on { background: var(--primary-100); }
 
 /* Чипы поверх карты: белые с обводкой и тенью. */
 .card-label.is-float,
 .card-btn.is-float {
-  background: var(--layer);
+  background: var(--deep-001);
   border: 1px solid var(--deep-100);
   box-shadow: var(--shadow-chip);
 }
@@ -342,7 +374,7 @@ img { display: block; }
 .route-media {
   position: relative;
   height: 250px;
-  background: #eef0ef;
+  background: var(--map-placeholder);
   overflow: hidden;
 }
 
@@ -429,7 +461,7 @@ img { display: block; }
   font-weight: 500;
   white-space: nowrap;
   color: var(--deep-999);
-  text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff;
+  text-shadow: 0 0 2px var(--map-halo), 0 0 2px var(--map-halo), 0 0 3px var(--map-halo);
 }
 .map-pin-box {
   width: 28px;
@@ -451,7 +483,7 @@ img { display: block; }
   max-width: calc(100% - 32px);
   padding: 10px 18px;
   border-radius: 14px;
-  background: rgba(20, 28, 36, 0.92);
+  background: var(--toast-bg);
   color: #fff;
   font-size: 14px;
   line-height: 18px;
@@ -674,7 +706,7 @@ img { display: block; }
   height: 30px;
   padding: 0 16px 8px;
   background: var(--layer);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 var(--divider);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -762,5 +794,5 @@ img { display: block; }
   margin: 0 -8px;
   padding: 12px 20px;
   border-radius: 0;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 var(--divider);
 }

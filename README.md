@@ -31,6 +31,14 @@ python3 serve.py --port 8120
 - Тайминги, длительности и число событий у обоих языков одни и те же: в `data.js`
   только числа, тексты и форматы собирает `src/i18n.js`.
 
+## Тема
+
+Светлая или тёмная — по системной настройке (`prefers-color-scheme`), меняется на лету.
+Цвета — токены коллекции Color TENET из Figma, режимы «FMK – Light» / «FMK – Dark»
+(тёмный макет — `12038:285889`), лежат переменными в `:root` в `styles.css`.
+Карта переключается между `assets/map-light.json` и `assets/map-dark.json`
+(тёмный стиль Findmykids из Places-on-map), маршрут на тёмной карте белый.
+
 ## Структура
 
 ```
@@ -44,5 +52,5 @@ assets/figma/    иконки из макета
 assets/          стиль карты, фото и иконки шапки из Places-on-map
 ```
 
-Карта — стиль «Findmykids V2 beta light» из Places-on-map (`assets/map-light.json`),
+Карта — стили «Findmykids V2 beta» light / dark из Places-on-map (`assets/map-*.json`),
 тайлы с CDN Findmykids, токен не нужен. Район — Ховрино, как на макете.

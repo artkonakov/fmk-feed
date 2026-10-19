@@ -1,9 +1,21 @@
 import * as maplibregl from "https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.mjs";
 import { LANG } from "./i18n.js";
 
-// Стиль «Findmykids V2 beta light» из Places-on-map: тайлы, спрайты и глифы
-// едут с CDN Findmykids, токен не нужен.
-const STYLE_URL = "assets/map-light.json";
+// Стили «Findmykids V2 beta» light / dark из Places-on-map: тайлы, спрайты
+// и глифы едут с CDN Findmykids, токен не нужен. Тема — по системе: светлая
+// карта со чёрным маршрутом, тёмная — с белым (Figma 12038:285889).
+const THEMES = {
+  light: { style: "assets/map-light.json", line: "#000000", casing: "#ffffff", casingOpacity: 0.9 },
+  dark: { style: "assets/map-dark.json", line: "#ffffff", casing: "#000000", casingOpacity: 0.5 }
+};
+const darkQuery = matchMedia("(prefers-color-scheme: dark)");
+const theme = () => THEMES[darkQuery.matches ? "dark" : "light"];
+
+// Все созданные карты: при смене системной темы им меняется стиль.
+const maps = new Set();
+darkQuery.addEventListener("change", () => {
+  maps.forEach((map) => map.setStyle(theme().style));
+});
 
 // Кадр подгоняется под то, что лежит поверх карты: чипы сверху и снизу
 // карточки и сами пины с подписями. Пин якорится центром плашки 28px,
@@ -12,8 +24,7 @@ const FRAME_GAP = 8;      // зазор от чипа / края карточк�
 const PIN_HALF = 14;      // половина плашки пина
 const LABEL_GAP = 2;      // зазор между подписью и плашкой
 
-// Маршрут на макете: чёрная линия 4px с белой подложкой.
-const LINE_COLOR = "#000000";
+// Маршрут на макете: линия 4px с подложкой (цвета — в THEMES).
 const LINE_WIDTH = 4;
 const CASING_WIDTH = 8;
 
@@ -44,7 +55,7 @@ function createMap(card, canvas, { coords, pins }) {
 
   const map = new maplibregl.Map({
     container: canvas,
-    style: STYLE_URL,
+    style: theme().style,
     bounds,
     interactive: false,
     attributionControl: false,
@@ -60,7 +71,10 @@ function createMap(card, canvas, { coords, pins }) {
   // Пины уже в DOM — меряем подписи и чипы и ставим кадр.
   map.fitBounds(bounds, { padding: framePadding(card, pinEls), duration: 0 });
 
+  // style.load срабатывает и после setStyle при смене темы: маршрут
+  // добавляется заново с цветами текущей темы.
   map.on("style.load", () => {
+    const { line, casing, casingOpacity } = theme();
     if (LANG === "en") useLatinLabels(map);
     map.addSource("route", {
       type: "geojson",
@@ -71,18 +85,19 @@ function createMap(card, canvas, { coords, pins }) {
       type: "line",
       source: "route",
       layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": "#ffffff", "line-width": CASING_WIDTH, "line-opacity": 0.9 }
+      paint: { "line-color": casing, "line-width": CASING_WIDTH, "line-opacity": casingOpacity }
     });
     map.addLayer({
       id: "route-line",
       type: "line",
       source: "route",
       layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": LINE_COLOR, "line-width": LINE_WIDTH }
+      paint: { "line-color": line, "line-width": LINE_WIDTH }
     });
   });
 
   map.once("idle", () => card.classList.add("is-map-ready"));
+  maps.add(map);
 
   return map;
 }
