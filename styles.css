@@ -706,3 +706,32 @@ img { display: block; }
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* ===== День единым блоком (вариант Е) ===== */
+/* Каждый день — белый блок в 8px от краёв экрана, между блоками 16px.
+   Внутри: заголовок дня и карточки как в варианте Г, встык и без своих
+   скруглений — карты идут во всю ширину блока. Снизу у блока 12px. */
+.is-day-blocks .feed { padding: 8px 8px calc(var(--safe-b) + 24px); gap: 16px; }
+.is-day-blocks .feed-day {
+  gap: 0;
+  padding-bottom: 12px;
+  border-radius: var(--r-card);
+  background: var(--layer);
+}
+.is-day-blocks .feed-card { border-radius: 0; }
+.is-day-blocks .feed-card:active { transform: none; }
+
+/* Заголовок дня: H2 Medium 18/19, отступы 12px — текст в 20px от края экрана.
+   Прилипает к верху ленты, пока его день на экране. */
+.day-title {
+  position: sticky;
+  top: -8px; /* sticky считает от края с учётом padding-top ленты (8px) — встаём вплотную к шапке */
+  z-index: 5;
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  background: var(--layer);
+  font-size: 18px;
+  line-height: 19px;
+  font-weight: 500;
+}

@@ -58,16 +58,20 @@ function renderProto(id) {
   renderHeader();
 
   const feed = document.getElementById("feed");
+  // dayBlocks: каждый день — единый белый блок с прилипающим заголовком
+  // вместо разделителя с висящей плашкой.
+  const dayBlocks = Boolean(VARIANTS[id].dayBlocks);
+  document.body.classList.toggle("is-day-blocks", dayBlocks);
   DAYS.forEach((day) => {
     const section = el("section", "feed-day");
-    section.append(dayStamp(day));
+    section.append(dayBlocks ? dayTitle(day) : dayStamp(day));
     day.items.forEach((item) => {
       if (item.type === "place") section.append(placeCard(item));
       else if (item.type === "route") section.append(routeCard(item));
     });
     feed.append(section);
   });
-  floatDayStamp(feed);
+  if (!dayBlocks) floatDayStamp(feed);
   if (VARIANTS[id].timeline) drawTimeline(feed);
 
   document.getElementById("backBtn").addEventListener("click", () => {
@@ -108,6 +112,14 @@ function dayStamp({ label }) {
   const stamp = el("div", "day-stamp");
   stamp.innerHTML = `<span class="day-stamp-pill">${label}</span>`;
   return stamp;
+}
+
+// Заголовок дня в варианте «день единым блоком»: H2 Medium 18/19, прилипает
+// к верху ленты (sticky внутри своего блока — следующий день его выталкивает).
+function dayTitle({ label }) {
+  const title = el("h2", "day-title");
+  title.textContent = label;
+  return title;
 }
 
 // Висящая плашка: одна на ленту, у верха. Разделители едут вместе с лентой
