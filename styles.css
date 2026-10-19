@@ -109,7 +109,12 @@ img { display: block; }
 
 /* ===== Меню ===== */
 .menu-header {
-  padding: calc(var(--safe-t) + 18px) 16px 14px;
+  /* Размер как у навбара ленты: 2px сверху, ряд 40px, 8px снизу. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--safe-t) + 50px);
+  padding: calc(var(--safe-t) + 2px) 16px 8px;
   background: var(--layer);
   font-size: 20px;
   font-weight: 700;
