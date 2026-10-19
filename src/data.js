@@ -131,9 +131,9 @@ export const DAYS = [
 //   а — карточка маршрута «карта сверху, текст и чипы под ней» (Figma 11668:398053);
 //   б — контрольный: как в приложении сейчас (Figma 11699:405063);
 //   в — таймлайн слева от карточек (Figma 11668:401539);
-//   г — базовая лента, чипы лежат на карте (Figma 11668:397454);
-//   д — карточки как в контрольном, но в одну строку: длительность слева, время со стрелкой справа;
-//   е — каждый день в едином белом блоке, карточки как в г, заголовок дня прилипает.
+//   г — каждый день единым белым блоком, карточки с чипами на карте
+//       (Figma 11668:397454), заголовок дня прилипает;
+//   д — карточки как в контрольном, но в одну строку: длительность слева, время со стрелкой справа.
 // routeCard: "overlay" — чипы на карте; "split" — текст и чипы под картой;
 // "control" (+ placeCard: "control") — контрольный вариант.
 // durationIcon: иконка у длительности в карточке места ("history" по умолчанию,
@@ -142,9 +142,8 @@ const VARIANT_DEFS = {
   a: { routeCard: "split" },
   b: { routeCard: "control", placeCard: "control" },
   c: { routeCard: "overlay", timeline: true },
-  d: { routeCard: "overlay", durationIcon: "time" },
-  f: { routeCard: "control", placeCard: "control", routeTitle: "duration", dayBar: "pill" },
-  g: { routeCard: "overlay", durationIcon: "time", dayBlocks: true }
+  d: { routeCard: "overlay", durationIcon: "time", dayBlocks: true },
+  f: { routeCard: "control", placeCard: "control", routeTitle: "duration", dayBar: "pill" }
 };
 
 export const VARIANTS = Object.fromEntries(
@@ -152,4 +151,5 @@ export const VARIANTS = Object.fromEntries(
 );
 
 // Старые ссылки ?p=v1 / v2 / v3 открывают тот же вариант под новой буквой.
-export const VARIANT_ALIASES = { v1: "d", v2: "a", v3: "c", control: "b" };
+// ?p=g — бывший вариант «Е», теперь это вариант Г.
+export const VARIANT_ALIASES = { v1: "d", v2: "a", v3: "c", control: "b", g: "d" };
