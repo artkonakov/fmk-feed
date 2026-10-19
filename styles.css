@@ -721,7 +721,9 @@ img { display: block; }
 .is-day-blocks .feed-card { border-radius: 0; }
 /* Карточка места между картами: по 8px воздуха сверху и снизу (12 + 8). */
 .is-day-blocks .place-card { padding-top: 20px; padding-bottom: 20px; }
-/* Последняя карточка дня: внизу и так 12px от блока — доп. отступ не нужен. */
+/* Первая и последняя карточки дня: доп. отступ не нужен — сверху заголовок
+   дня, снизу и так 12px от блока. */
+.is-day-blocks .day-title + .place-card { padding-top: 12px; }
 .is-day-blocks .place-card:last-child { padding-bottom: 12px; }
 .is-day-blocks .feed-card:active { transform: none; }
 
