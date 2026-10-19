@@ -114,7 +114,7 @@ img { display: block; }
   font-size: 20px;
   font-weight: 700;
   text-align: center;
-  border-bottom: 1px solid var(--deep-100);
+  box-shadow: 0 1px 0 var(--divider); /* та же линия, что у навбара ленты */
 }
 .menu-content { padding: 16px; overflow: auto; }
 .list-card { background: var(--layer); border-radius: var(--r-card); overflow: hidden; }
