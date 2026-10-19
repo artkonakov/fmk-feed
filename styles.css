@@ -721,6 +721,8 @@ img { display: block; }
 .is-day-blocks .feed-card { border-radius: 0; }
 /* Карточка места между картами: по 8px воздуха сверху и снизу (12 + 8). */
 .is-day-blocks .place-card { padding-top: 20px; padding-bottom: 20px; }
+/* Последняя карточка дня: внизу и так 12px от блока — доп. отступ не нужен. */
+.is-day-blocks .place-card:last-child { padding-bottom: 12px; }
 .is-day-blocks .feed-card:active { transform: none; }
 
 /* Заголовок дня: H2 Medium 18/19, отступы 12px — текст в 20px от края экрана.
