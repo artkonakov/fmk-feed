@@ -711,7 +711,11 @@ img { display: block; }
 /* Каждый день — белый блок в 8px от краёв экрана, между блоками 16px.
    Внутри: заголовок дня и карточки как в варианте Г, встык и без своих
    скруглений — карты идут во всю ширину блока. Снизу у блока 12px. */
-.is-day-blocks .feed { padding: 16px 8px calc(var(--safe-b) + 24px); gap: 16px; }
+/* Отступ 16px под навбаром — margin первого блока, а не padding ленты:
+   Safari и Chrome по-разному учитывают padding скролл-контейнера у sticky,
+   и прилипший заголовок в Safari вставал с серой полосой над собой. */
+.is-day-blocks .feed { padding: 0 8px calc(var(--safe-b) + 24px); gap: 16px; }
+.is-day-blocks .feed-day:first-of-type { margin-top: 16px; }
 .is-day-blocks .feed-day {
   gap: 0;
   border-radius: var(--r-card);
@@ -741,7 +745,7 @@ img { display: block; }
    Прилипает к верху ленты, пока его день на экране. */
 .day-title {
   position: sticky;
-  top: -16px; /* sticky считает от края с учётом padding-top ленты (16px) — встаём вплотную к шапке */
+  top: 0;
   z-index: 5;
   margin: 0;
   padding: 12px;
