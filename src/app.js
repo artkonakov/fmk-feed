@@ -71,7 +71,8 @@ function renderProto(id) {
     });
     feed.append(section);
   });
-  if (!dayBlocks) floatDayStamp(feed);
+  if (dayBlocks) watchDayTitles(feed);
+  else floatDayStamp(feed);
   if (VARIANTS[id].timeline) drawTimeline(feed);
 
   document.getElementById("backBtn").addEventListener("click", () => {
@@ -120,6 +121,22 @@ function dayTitle({ label }) {
   const title = el("h2", "day-title");
   title.textContent = label;
   return title;
+}
+
+// Прилип ли заголовок дня: он у верха ленты, а его блок уже уехал под шапку.
+// Прилипший растягивается на всю ширину и получает линию снизу, как у навбара.
+function watchDayTitles(feed) {
+  const titles = [...feed.querySelectorAll(".day-title")];
+  const update = () => {
+    const top = feed.getBoundingClientRect().top;
+    titles.forEach((title) => {
+      const block = title.parentElement.getBoundingClientRect().top;
+      title.classList.toggle("is-stuck", block < top - 0.5 && title.getBoundingClientRect().top <= top + 0.5);
+    });
+  };
+  feed.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
 }
 
 // Висящая плашка: одна на ленту, у верха. Разделители едут вместе с лентой

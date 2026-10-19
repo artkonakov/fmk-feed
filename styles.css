@@ -719,6 +719,8 @@ img { display: block; }
   background: var(--layer);
 }
 .is-day-blocks .feed-card { border-radius: 0; }
+/* Карточка места между картами: по 8px воздуха сверху и снизу (12 + 8). */
+.is-day-blocks .place-card { padding-top: 20px; padding-bottom: 20px; }
 .is-day-blocks .feed-card:active { transform: none; }
 
 /* Заголовок дня: H2 Medium 18/19, отступы 12px — текст в 20px от края экрана.
@@ -734,4 +736,13 @@ img { display: block; }
   font-size: 18px;
   line-height: 19px;
   font-weight: 500;
+}
+/* Прилипший заголовок: во всю ширину экрана (выходит в поля ленты по 8px),
+   без скруглений и с линией снизу, как у навбара. Текст остаётся на месте:
+   отступ слева 12 + 8. */
+.day-title.is-stuck {
+  margin: 0 -8px;
+  padding: 12px 20px;
+  border-radius: 0;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
