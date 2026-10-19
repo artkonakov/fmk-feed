@@ -726,6 +726,9 @@ img { display: block; }
   height: 12px;
 }
 .is-day-blocks .feed-card { border-radius: 0; }
+/* Карта маршрута — отдельной плиткой внутри блока: 8px от краёв и скругление
+   12px, чтобы маршрут не сливался с карточками мест на белом. */
+.is-day-blocks .route-card { margin: 0 8px; border-radius: 12px; }
 /* Карточка места между картами: по 8px воздуха сверху и снизу (12 + 8). */
 .is-day-blocks .place-card { padding-top: 20px; padding-bottom: 20px; }
 /* Первая и последняя карточки дня: доп. отступ не нужен — сверху заголовок
