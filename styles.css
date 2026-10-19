@@ -711,7 +711,7 @@ img { display: block; }
 /* Каждый день — белый блок в 8px от краёв экрана, между блоками 16px.
    Внутри: заголовок дня и карточки как в варианте Г, встык и без своих
    скруглений — карты идут во всю ширину блока. Снизу у блока 12px. */
-.is-day-blocks .feed { padding: 8px 8px calc(var(--safe-b) + 24px); gap: 16px; }
+.is-day-blocks .feed { padding: 16px 8px calc(var(--safe-b) + 24px); gap: 16px; }
 .is-day-blocks .feed-day {
   gap: 0;
   border-radius: var(--r-card);
@@ -738,7 +738,7 @@ img { display: block; }
    Прилипает к верху ленты, пока его день на экране. */
 .day-title {
   position: sticky;
-  top: -8px; /* sticky считает от края с учётом padding-top ленты (8px) — встаём вплотную к шапке */
+  top: -16px; /* sticky считает от края с учётом padding-top ленты (16px) — встаём вплотную к шапке */
   z-index: 5;
   margin: 0;
   padding: 12px;
