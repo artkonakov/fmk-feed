@@ -714,9 +714,16 @@ img { display: block; }
 .is-day-blocks .feed { padding: 8px 8px calc(var(--safe-b) + 24px); gap: 16px; }
 .is-day-blocks .feed-day {
   gap: 0;
-  padding-bottom: 12px;
   border-radius: var(--r-card);
   background: var(--layer);
+}
+/* 12px снизу блока — отдельным элементом, а не padding: прилипший заголовок
+   держится до самого края блока (sticky останавливается на padding) и только
+   потом уезжает вверх вместе с ним. */
+.is-day-blocks .feed-day::after {
+  content: "";
+  flex: none;
+  height: 12px;
 }
 .is-day-blocks .feed-card { border-radius: 0; }
 /* Карточка места между картами: по 8px воздуха сверху и снизу (12 + 8). */
