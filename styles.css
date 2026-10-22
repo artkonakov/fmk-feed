@@ -449,6 +449,29 @@ img { display: block; }
 .route-top > *,
 .route-bottom > * { pointer-events: auto; }
 
+/* Запасная картинка вместо карты (feedmap.js → showFallback): снимок в той же
+   камере, что у живой карты, пины поверх. Светлая и тёмная — по системе. */
+.map-fallback {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--map-placeholder);
+}
+.map-fallback-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.map-fallback-img.is-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  .map-fallback-img.is-light { display: none; }
+  .map-fallback-img.is-dark { display: block; }
+}
+.map-pin.is-static { position: absolute; left: 0; top: 0; }
+
 /* [T] Pin Place на карте */
 .map-pin {
   /* position не задаём: absolute приходит из .maplibregl-marker */

@@ -1,21 +1,32 @@
-import * as maplibregl from "https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.mjs";
 import { LANG } from "./i18n.js";
+import { project, fitCamera, fallbackCamera, FALLBACK_SIZE, fallbackUrl } from "./mapcamera.js";
+import { MAP_THEMES, addRouteLayers, useLatinLabels } from "./mapstyle.js";
 
-// Стили «Findmykids V2 beta» light / dark из Places-on-map: тайлы, спрайты
-// и глифы едут с CDN Findmykids, токен не нужен. Тема — по системе: светлая
-// карта со чёрным маршрутом, тёмная — с белым (Figma 12038:285889).
-const THEMES = {
-  light: { style: "assets/map-light.json", line: "#000000", casing: "#ffffff", casingOpacity: 0.9 },
-  dark: { style: "assets/map-dark.json", line: "#ffffff", casing: "#000000", casingOpacity: 0.5 }
-};
+// MapLibre грузится необязательно: если unpkg недоступен, лента всё равно
+// рисуется, а вместо карт встают запасные картинки.
+const maplibreReady = import("https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.mjs").catch((error) => {
+  console.warn("maplibre не загрузился — карты из картинок", error);
+  return null;
+});
+
+// Тема — по системе (тёмная карта с белым маршрутом, см. mapstyle.js).
 const darkQuery = matchMedia("(prefers-color-scheme: dark)");
-const theme = () => THEMES[darkQuery.matches ? "dark" : "light"];
+const themeName = () => (darkQuery.matches ? "dark" : "light");
+const theme = () => MAP_THEMES[themeName()];
 
-// Все созданные карты: при смене системной темы им меняется стиль.
+// Все живые карты: при смене системной темы им меняется стиль.
+// Запасные картинки переключаются сами — через CSS (см. .map-fallback).
 const maps = new Set();
 darkQuery.addEventListener("change", () => {
   maps.forEach((map) => map.setStyle(theme().style));
 });
+
+// ?map=off — сразу картинки вместо карт: проверить и показать запасной режим.
+const FORCE_FALLBACK = new URLSearchParams(location.search).get("map") === "off";
+
+// Карта считается не загрузившейся, если за это время не пришло ни одного
+// тайла, — тогда вместо неё встаёт запасная картинка.
+const MAP_TIMEOUT = 8000;
 
 // Кадр подгоняется под то, что лежит поверх карты: чипы сверху и снизу
 // карточки и сами пины с подписями. Пин якорится центром плашки 28px,
@@ -23,10 +34,6 @@ darkQuery.addEventListener("change", () => {
 const FRAME_GAP = 8;      // зазор от чипа / края карточки до пина
 const PIN_HALF = 14;      // половина плашки пина
 const LABEL_GAP = 2;      // зазор между подписью и плашкой
-
-// Маршрут на макете: линия 4px с подложкой (цвета — в THEMES).
-const LINE_WIDTH = 4;
-const CASING_WIDTH = 8;
 
 // Карточек с картой немного, но WebGL-контексты не бесконечны:
 // карта создаётся, только когда карточка подъезжает к экрану.
@@ -41,26 +48,40 @@ const observer = new IntersectionObserver(
   { rootMargin: "300px 0px" }
 );
 
-export function mountRouteMap(card, { coords, pins }) {
-  const canvas = card.querySelector(".route-map");
-  card.__initMap = () => createMap(card, canvas, { coords, pins });
+export function mountRouteMap(card, opts) {
+  card.__initMap = () => createMap(card, opts);
   observer.observe(card);
 }
 
-function createMap(card, canvas, { coords, pins }) {
+async function createMap(card, { route, coords, pins }) {
+  const canvas = card.querySelector(".route-map");
+  const maplibregl = await maplibreReady;
+  if (!maplibregl || !navigator.onLine || FORCE_FALLBACK) {
+    showFallback(card, canvas, { route, coords, pins });
+    return;
+  }
+
   const bounds = coords.reduce(
     (b, c) => b.extend(c),
     new maplibregl.LngLatBounds(coords[0], coords[0])
   );
 
-  const map = new maplibregl.Map({
-    container: canvas,
-    style: theme().style,
-    bounds,
-    interactive: false,
-    attributionControl: false,
-    fadeDuration: 0
-  });
+  let map;
+  try {
+    map = new maplibregl.Map({
+      container: canvas,
+      style: theme().style,
+      bounds,
+      interactive: false,
+      attributionControl: false,
+      fadeDuration: 0
+    });
+  } catch (error) {
+    // Например, WebGL недоступен.
+    console.warn("карта не создалась — картинка", error);
+    showFallback(card, canvas, { route, coords, pins });
+    return;
+  }
 
   const pinEls = pins.map((pin) => {
     const element = buildPin(pin);
@@ -74,43 +95,99 @@ function createMap(card, canvas, { coords, pins }) {
   // style.load срабатывает и после setStyle при смене темы: маршрут
   // добавляется заново с цветами текущей темы.
   map.on("style.load", () => {
-    const { line, casing, casingOpacity } = theme();
     if (LANG === "en") useLatinLabels(map);
-    map.addSource("route", {
-      type: "geojson",
-      data: { type: "Feature", geometry: { type: "LineString", coordinates: coords } }
-    });
-    map.addLayer({
-      id: "route-casing",
-      type: "line",
-      source: "route",
-      layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": casing, "line-width": CASING_WIDTH, "line-opacity": casingOpacity }
-    });
-    map.addLayer({
-      id: "route-line",
-      type: "line",
-      source: "route",
-      layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": line, "line-width": LINE_WIDTH }
-    });
+    addRouteLayers(map, coords, theme());
   });
 
-  map.once("idle", () => card.classList.add("is-map-ready"));
-  maps.add(map);
+  // Пришёл ли хоть один тайл карты: без них остаётся пустой фон с линией.
+  let tiles = 0;
+  map.on("sourcedata", (event) => {
+    if (event.tile && event.sourceId !== "route") tiles += 1;
+  });
 
-  return map;
-}
-
-// Подписи стиля берут сначала местное написание (name:nonlatin). Для английской
-// версии — латиница: «coalesce(name:latin, name)».
-function useLatinLabels(map) {
-  map.getStyle().layers.forEach((layer) => {
-    const field = layer.layout?.["text-field"];
-    if (JSON.stringify(field ?? "").includes("name:nonlatin")) {
-      map.setLayoutProperty(layer.id, "text-field", ["coalesce", ["get", "name:latin"], ["get", "name"]]);
+  const fallBack = () => {
+    if (card.classList.contains("is-map-fallback")) return;
+    maps.delete(map);
+    map.remove();
+    showFallback(card, canvas, { route, coords, pins });
+  };
+  const timer = setTimeout(fallBack, MAP_TIMEOUT);
+  map.on("idle", () => {
+    if (card.classList.contains("is-map-fallback")) return;
+    if (tiles > 0) {
+      clearTimeout(timer);
+      card.classList.add("is-map-ready");
     }
   });
+  map.on("error", (event) => {
+    // Стиль, тайлы или глифы не грузятся и тайлов так и нет — сразу картинка.
+    if (tiles === 0 && !navigator.onLine) fallBack();
+    else console.warn("maplibre:", event?.error?.message);
+  });
+
+  maps.add(map);
+}
+
+// Запасная картинка вместо карты: снимок из assets/map-fallback/ в той же
+// камере, что у живой карты (mapcamera.js), плюс живые пины поверх. Картинок
+// две — светлая и тёмная, нужную показывает CSS по системной теме.
+function showFallback(card, canvas, { route, coords, pins }) {
+  canvas.innerHTML = "";
+  card.classList.add("is-map-fallback");
+
+  const layer = document.createElement("div");
+  layer.className = "map-fallback";
+  canvas.append(layer);
+
+  const imgs = ["light", "dark"].map((name) => {
+    const img = document.createElement("img");
+    img.className = `map-fallback-img is-${name}`;
+    img.alt = "";
+    img.src = fallbackUrl(LANG, route, name);
+    layer.append(img);
+    return img;
+  });
+
+  const pinEls = pins.map((pin) => {
+    const element = buildPin(pin);
+    element.classList.add("is-static");
+    layer.append(element);
+    return element;
+  });
+
+  // Камера, которую выбрала бы живая карта, и камера, в которой снята картинка.
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const cam = fitCamera(coords, w, h, framePadding(card, pinEls));
+  const ref = fallbackCamera(coords);
+  const scale = 2 ** cam.zoom;
+  const k = 2 ** (cam.zoom - ref.zoom);
+
+  // Где на экране точка мира (пиксели нулевого зума).
+  const toScreen = ([x, y]) => [w / 2 + (x - cam.center[0]) * scale, h / 2 + (y - cam.center[1]) * scale];
+
+  // Левый верхний угол картинки — в пикселях мира её зума.
+  const refScale = 2 ** ref.zoom;
+  const left = w / 2 + ((ref.center[0] * refScale - FALLBACK_SIZE.width / 2) * k - cam.center[0] * scale);
+  const top = h / 2 + ((ref.center[1] * refScale - FALLBACK_SIZE.height / 2) * k - cam.center[1] * scale);
+  imgs.forEach((img) => {
+    img.style.width = `${FALLBACK_SIZE.width * k}px`;
+    img.style.height = `${FALLBACK_SIZE.height * k}px`;
+    img.style.transform = `translate(${left}px, ${top}px)`;
+  });
+
+  pinEls.forEach((el, i) => {
+    const [x, y] = toScreen(project(pins[i].lngLat));
+    el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+  });
+
+  const ready = () => card.classList.add("is-map-ready");
+  const current = imgs[themeName() === "dark" ? 1 : 0];
+  if (current.complete) ready();
+  else {
+    current.addEventListener("load", ready, { once: true });
+    current.addEventListener("error", ready, { once: true });
+  }
 }
 
 // Отступы кадра в px от краёв карточки до точек маршрута.

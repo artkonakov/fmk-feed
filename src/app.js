@@ -303,6 +303,7 @@ function routeCard(item) {
     label: split ? splitLabel : label
   });
   mountRouteMap(card, {
+    route: item.route,
     coords,
     pins: [pin(item.from, coords[0], T.start), pin(item.to, coords.at(-1), T.finish)]
   });
@@ -399,6 +400,7 @@ function routeCardControl(item) {
     label
   });
   mountRouteMap(card, {
+    route: item.route,
     coords,
     pins: [pin(item.from, coords[0], T.start), pin(item.to, coords.at(-1), T.finish)]
   });

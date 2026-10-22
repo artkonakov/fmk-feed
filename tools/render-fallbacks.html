@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Запасные картинки карт</title>
+  <link href="https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.css" rel="stylesheet">
+  <style>
+    body { font: 14px/1.4 -apple-system, sans-serif; margin: 16px; }
+    #stage { position: fixed; left: 0; top: 0; opacity: 0.01; pointer-events: none; }
+    #log { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <!--
+    Отрисовывает каждый маршрут ленты в картинку — для обоих языков и обеих
+    тем — и отправляет их в tools/save_fallback.py, который кладёт файлы в
+    assets/map-fallback/. Камера — fallbackCamera() из src/mapcamera.js, ту же
+    камеру прототип восстанавливает, когда ставит картинку вместо карты.
+
+      python3 tools/save_fallback.py          # в одном терминале
+      python3 serve.py --port 8120            # в другом
+      открыть http://localhost:8120/tools/render-fallbacks.html
+  -->
+  <h1>Запасные картинки карт</h1>
+  <div id="log">Рисую…</div>
+  <div id="stage"></div>
+  <script type="module">
+    import * as maplibregl from "https://unpkg.com/maplibre-gl@6.9.1/dist/maplibre-gl.mjs";
+    import { ROUTES } from "../src/routes.js";
+    import { ROUTES_US } from "../src/routes-us.js";
+    import { unproject, fallbackCamera, FALLBACK_SIZE } from "../src/mapcamera.js";
+    import { MAP_THEMES, addRouteLayers, useLatinLabels } from "../src/mapstyle.js";
+
+    const SAVE = "http://127.0.0.1:8121/save";
+    const PIXEL_RATIO = 2;
+    const log = document.getElementById("log");
+    const stage = document.getElementById("stage");
+    const write = (line) => { log.textContent += "\n" + line; };
+
+    async function render(lang, name, coords, themeName) {
+      const theme = MAP_THEMES[themeName];
+      const cam = fallbackCamera(coords);
+      const el = document.createElement("div");
+      el.style.cssText = `width:${FALLBACK_SIZE.width}px;height:${FALLBACK_SIZE.height}px`;
+      stage.append(el);
+      const map = new maplibregl.Map({
+        container: el,
+        style: "../" + theme.style,
+        center: unproject(cam.center),
+        zoom: cam.zoom,
+        interactive: false,
+        attributionControl: false,
+        fadeDuration: 0,
+        pixelRatio: PIXEL_RATIO,
+        canvasContextAttributes: { preserveDrawingBuffer: true }
+      });
+      // Пути в стиле относительные к странице прототипа — тайлы и глифы с CDN.
+      await new Promise((resolve) => map.on("style.load", () => {
+        if (lang === "en") useLatinLabels(map);
+        addRouteLayers(map, coords, theme);
+        resolve();
+      }));
+      await new Promise((resolve) => map.once("idle", resolve));
+      const blob = await new Promise((resolve) => map.getCanvas().toBlob(resolve, "image/webp", 0.8));
+      const file = `${lang}-${name}-${themeName}`;
+      const res = await fetch(`${SAVE}?name=${file}`, { method: "POST", body: blob });
+      write(`${file}: ${res.ok ? Math.round(blob.size / 1024) + " KB" : "ошибка " + res.status}`);
+      map.remove();
+      el.remove();
+    }
+
+    const sets = [["ru", ROUTES], ["en", ROUTES_US]];
+    for (const [lang, routes] of sets) {
+      for (const [name, coords] of Object.entries(routes)) {
+        for (const themeName of ["light", "dark"]) {
+          await render(lang, name, coords, themeName);
+        }
+      }
+    }
+    write("Готово.");
+    document.title = "done";
+  </script>
+</body>
+</html>
