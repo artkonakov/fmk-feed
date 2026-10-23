@@ -285,7 +285,7 @@ function routeCard(item) {
         </div>
       </div>`;
   } else {
-    card.innerHTML = (headed ? routeHead(item) : "") + media(`
+    card.innerHTML = (headed ? routeHead(item, { arrow: false }) : "") + media(`
       ${item.badges ? `<div class="route-top">${badge(item.badges.left)}${badge(item.badges.right)}</div>` : ""}
       <div class="route-bottom">
         <span class="card-label is-float">
@@ -401,7 +401,8 @@ function routeCardControl(item) {
 }
 
 // Шапка маршрута контрольного вида: иконка режима, длительность, время, стрелка.
-function routeHead(item) {
+// В Д (headed) стрелки нет — время стоит само по себе.
+function routeHead(item, { arrow = true } = {}) {
   return `
     <div class="ctl-head">
       <span class="ctl-icon is-plain is-mode is-${item.mode}"><span class="icon-tint" style="--icon:url('${ICON[item.mode]}')"></span></span>
@@ -412,7 +413,7 @@ function routeHead(item) {
         <h2 class="ctl-title">${MODE_TITLE[item.mode]} <span class="ctl-dot">•</span> ${item.duration}</h2>
         <span class="ctl-sub">${item.time}</span>
       </div>`}
-      <span class="ctl-arrow"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>
+      ${arrow ? `<span class="ctl-arrow"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>` : ""}
     </div>`;
 }
 
