@@ -285,11 +285,18 @@ function routeCard(item) {
         </div>
       </div>`;
   } else {
+    // В Д длительность уже в шапке, поэтому в чипе внизу — шаги у прогулки
+    // и расстояние у поездки.
+    const meters = routeLength(coords);
+    const steps = Math.round(meters / 0.72);
+    const chip = !headed ? item.duration
+      : item.mode === "car" ? fmtDistance(meters)
+      : `${fmtInt(steps)} ${plural(steps, T.stepsWord)}`;
     card.innerHTML = (headed ? routeHead(item, { arrow: false }) : "") + media(`
       ${item.badges ? `<div class="route-top">${badge(item.badges.left)}${badge(item.badges.right)}</div>` : ""}
       <div class="route-bottom">
         <span class="card-label is-float">
-          <img src="${ICON[item.mode]}" width="20" height="20" alt="">${item.duration}
+          <img src="${ICON[item.mode]}" width="20" height="20" alt="">${chip}
         </span>
         ${events(true)}
       </div>`);
