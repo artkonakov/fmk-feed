@@ -296,7 +296,7 @@ function routeCard(item) {
       ${item.badges ? `<div class="route-top">${badge(item.badges.left)}${badge(item.badges.right)}</div>` : ""}
       <div class="route-bottom">
         <span class="card-label is-float">
-          <img src="${ICON[headed && item.mode === "walk" ? "steps" : item.mode]}" width="20" height="20" alt="">${chip}
+          <img src="${ICON[!headed ? item.mode : item.mode === "car" ? "distance" : "steps"]}" width="20" height="20" alt="">${chip}
         </span>
         ${events(true)}
       </div>`);

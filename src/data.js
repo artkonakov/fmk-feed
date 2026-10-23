@@ -58,7 +58,8 @@ const ICON = {
   history: `${FIG}/icon-history.svg`,
   time: `${FIG}/icon-time.svg`,
   walk: `${FIG}/icon-walking.svg`,
-  steps: `${FIG}/icon-steps.svg`, // TENET Graphics icon-24-steps
+  steps: `${FIG}/icon-steps.svg`, // TENET Graphics icon-24-steps, Fill=true
+  distance: `${FIG}/icon-directions.svg`, // TENET Graphics icon-24-directions-form, Fill=true
   car: `${FIG}/icon-car.svg`,
   speed: `${FIG}/icon-speed.svg`,
   star: `${FIG}/icon-badge-star.svg`,
