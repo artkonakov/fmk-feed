@@ -236,15 +236,18 @@ function placeCard(item) {
   return card;
 }
 
-// Feed Card (маршрут). Два стиля (VARIANTS[*].routeCard):
+// Feed Card (маршрут). Стили (VARIANTS[*].routeCard):
 //   overlay — статичная карта на всю карточку, чипы лежат поверх (v1);
-//   split   — карта сверху, под ней «Прогулка • 2,5 км», время и чипы (v2).
+//   split   — карта сверху, под ней «Прогулка • 2,5 км», время и чипы (v2);
+//   headed  — шапка контрольного вида, под ней карта как в overlay (Д).
 const MODE_TITLE = { walk: T.walk, car: T.drive };
 
 function routeCard(item) {
   if (routeStyle === "control") return routeCardControl(item);
   const split = routeStyle === "split";
-  const card = el("article", `feed-card route-card ${split ? "is-split" : "is-overlay"}`);
+  // headed — карта с чипами как в overlay, а над ней шапка контрольного вида.
+  const headed = routeStyle === "headed";
+  const card = el("article", `feed-card route-card ${split ? "is-split" : "is-overlay"}${headed ? " ctl-card ctl-route is-headed" : ""}`);
   const coords = ROUTES[item.route];
   const badge = (b) => b
     ? `<span class="card-label is-float${b.tone === "good" ? " is-good" : ""}">
@@ -282,7 +285,7 @@ function routeCard(item) {
         </div>
       </div>`;
   } else {
-    card.innerHTML = media(`
+    card.innerHTML = (headed ? routeHead(item) : "") + media(`
       ${item.badges ? `<div class="route-top">${badge(item.badges.left)}${badge(item.badges.right)}</div>` : ""}
       <div class="route-bottom">
         <span class="card-label is-float">
@@ -361,17 +364,7 @@ function routeCardControl(item) {
 
   const card = el("article", "feed-card route-card ctl-card ctl-route");
   card.innerHTML = `
-    <div class="ctl-head">
-      <span class="ctl-icon is-plain is-mode is-${item.mode}"><span class="icon-tint" style="--icon:url('${ICON[item.mode]}')"></span></span>
-      ${routeTitle === "duration" ? `
-      <h2 class="ctl-title">${item.duration}</h2>
-      <span class="ctl-sub">${item.time}</span>` : `
-      <div class="ctl-text">
-        <h2 class="ctl-title">${MODE_TITLE[item.mode]} <span class="ctl-dot">•</span> ${item.duration}</h2>
-        <span class="ctl-sub">${item.time}</span>
-      </div>`}
-      <span class="ctl-arrow"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>
-    </div>
+    ${routeHead(item)}
     <div class="route-media">
       <div class="route-map" aria-hidden="true"></div>
       <span class="route-play" aria-hidden="true">
@@ -405,6 +398,22 @@ function routeCardControl(item) {
     pins: [pin(item.from, coords[0], T.start), pin(item.to, coords.at(-1), T.finish)]
   });
   return card;
+}
+
+// Шапка маршрута контрольного вида: иконка режима, длительность, время, стрелка.
+function routeHead(item) {
+  return `
+    <div class="ctl-head">
+      <span class="ctl-icon is-plain is-mode is-${item.mode}"><span class="icon-tint" style="--icon:url('${ICON[item.mode]}')"></span></span>
+      ${routeTitle === "duration" ? `
+      <h2 class="ctl-title">${item.duration}</h2>
+      <span class="ctl-sub">${item.time}</span>` : `
+      <div class="ctl-text">
+        <h2 class="ctl-title">${MODE_TITLE[item.mode]} <span class="ctl-dot">•</span> ${item.duration}</h2>
+        <span class="ctl-sub">${item.time}</span>
+      </div>`}
+      <span class="ctl-arrow"><span class="icon-tint" style="--icon:url('${ICON.arrow}')"></span></span>
+    </div>`;
 }
 
 // Длина линии маршрута в метрах (по сфере — для коротких отрезков хватает).

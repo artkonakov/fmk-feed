@@ -657,6 +657,9 @@ img { display: block; }
   margin: 0 2px;
   border-radius: 14px;
 }
+/* Д: под шапкой карта как в В — с чипами и подписями пинов, отступ 2px. */
+.ctl-route.is-headed .route-media { height: 220px; margin: 0 2px 2px; }
+
 /* «Безопасное вождение»: белая вкладка в углу карты со скруглённым низом справа. */
 .ctl-tag-wrap { left: 0; right: auto; top: 0; }
 .ctl-tag {
