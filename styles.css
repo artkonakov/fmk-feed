@@ -20,7 +20,7 @@
   --shadow-chip: 0 6px 12px rgba(24, 36, 47, 0.1);
   --divider: rgba(0, 0, 0, 0.05);   /* unique/black-white/transparent-95 */
   --page: #e9eaec;                  /* подложка вокруг прототипа на широком экране */
-  --map-placeholder: #eef0ef;       /* фон карты, пока грузятся тайлы */
+  --map-placeholder: #f8faf7;       /* фон карты, пока грузятся тайлы */
   --map-halo: #ffffff;              /* ореол подписей пинов на карте */
   --toast-bg: rgba(20, 28, 36, 0.92);
   --safe-t: env(safe-area-inset-top, 0px);
@@ -49,7 +49,7 @@
     --primary-100: #002147;
     --divider: rgba(255, 255, 255, 0.05);
     --page: #0d0d0d;
-    --map-placeholder: #151517;  /* фон тёмного стиля карты */
+    --map-placeholder: #24343d;  /* фон тёмного стиля карты */
     --map-halo: #000000;
     --toast-bg: rgba(63, 65, 69, 0.95);
   }
