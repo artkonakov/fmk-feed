@@ -73,5 +73,5 @@ assets/figma/    иконки из макета
 assets/          стиль карты, фото и иконки шапки из Places-on-map
 ```
 
-Карта — стили «Findmykids V2 beta» light / dark из Places-on-map (`assets/map-*.json`),
+Карта — стили «Findmykids Vibrant» light / dark (Contrast, Buildings, без рельефа и hillshade) (`assets/map-*.json`),
 тайлы с CDN Findmykids, токен не нужен. Район — Ховрино, как на макете.

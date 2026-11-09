@@ -1,7 +1,7 @@
 // Оформление карты маршрута — общее для живой карты (feedmap.js) и для
 // инструмента запасных картинок (tools/render-fallbacks.html).
 
-// Стили «Findmykids V2 beta» light / dark из Places-on-map: тайлы, спрайты
+// Стили «Findmykids Vibrant» light / dark (Contrast, Buildings, без рельефа и hillshade): тайлы, спрайты
 // и глифы едут с CDN Findmykids, токен не нужен. Светлая карта — с чёрным
 // маршрутом, тёмная — с белым (Figma 12038:285889).
 export const MAP_THEMES = {
